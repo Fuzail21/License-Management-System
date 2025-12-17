@@ -29,7 +29,7 @@
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Department</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col"
                             class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
                         </th>
@@ -42,7 +42,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $user->email }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $user->department->name ?? 'N/A' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ucfirst($user->role) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <x-status-badge :status="$user->status->value" />
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end items-center gap-3">
                                     <a href="{{ route('admin.users.show', $user) }}"

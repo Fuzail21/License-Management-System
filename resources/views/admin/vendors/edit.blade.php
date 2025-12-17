@@ -13,7 +13,7 @@
             @method('PUT')
 
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Vendor Name</label>
+                <label for="name" class="block text-sm font-medium text-gray-700">Vendor Name <span class="text-red-500">*</span></label>
                 <div class="mt-1">
                     <input type="text" name="name" id="name" value="{{ old('name', $vendor->name) }}" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
@@ -23,19 +23,18 @@
                 @enderror
             </div>
 
-            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <div>
-                    <label for="contact_person" class="block text-sm font-medium text-gray-700">Contact Person</label>
-                    <div class="mt-1">
-                        <input type="text" name="contact_person" id="contact_person"
-                            value="{{ old('contact_person', $vendor->contact_person) }}"
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                    </div>
-                    @error('contact_person')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+            <div>
+                <label for="company_name" class="block text-sm font-medium text-gray-700">Company Name</label>
+                <div class="mt-1">
+                    <input type="text" name="company_name" id="company_name" value="{{ old('company_name', $vendor->company_name) }}"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
                 </div>
+                @error('company_name')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
 
+            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                     <div class="mt-1">
@@ -57,17 +56,6 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
-
-                <div>
-                    <label for="website" class="block text-sm font-medium text-gray-700">Website</label>
-                    <div class="mt-1">
-                        <input type="url" name="website" id="website" value="{{ old('website', $vendor->website) }}"
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                    </div>
-                    @error('website')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
             </div>
 
             <div>
@@ -77,6 +65,20 @@
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">{{ old('address', $vendor->address) }}</textarea>
                 </div>
                 @error('address')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status <span class="text-red-500">*</span></label>
+                <div class="mt-1">
+                    <select id="status" name="status" required
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                        <option value="active" {{ old('status', $vendor->status->value) == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status', $vendor->status->value) == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                </div>
+                @error('status')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

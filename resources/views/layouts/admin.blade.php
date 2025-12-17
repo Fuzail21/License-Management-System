@@ -128,7 +128,7 @@
                     <div class="flex items-center gap-4 ml-auto">
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" @click.away="open = false"
+                            <button @click="open = !open" @click.outside="open = false"
                                 class="flex items-center gap-2 focus:outline-none">
                                 <span
                                     class="text-sm font-medium text-gray-700 hidden sm:block">{{ auth()->user()->name ?? 'Admin' }}</span>

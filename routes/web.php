@@ -43,8 +43,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::resource('user-licenses', UserLicenseController::class);
 
     Route::get('renewals', [LicenseRenewalController::class, 'index'])->name('renewals.index');
-    Route::get('renewals/create', [LicenseRenewalController::class, 'create'])->name('renewals.create');
-    Route::post('renewals', [LicenseRenewalController::class, 'store'])->name('renewals.store');
+    Route::get('renewals/create/{userLicense}', [LicenseRenewalController::class, 'create'])->name('renewals.create');
+    Route::post('renewals/{userLicense}', [LicenseRenewalController::class, 'store'])->name('renewals.store');
 
     Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');

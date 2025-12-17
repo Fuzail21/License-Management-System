@@ -47,30 +47,59 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="expiry_date" class="block text-sm font-medium text-gray-700">Expiry Date</label>
-                <div class="mt-1">
-                    <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date') }}" required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div>
+                    <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <div class="mt-1">
+                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', date('Y-m-d')) }}" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                    </div>
+                    @error('start_date')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-                @error('expiry_date')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
 
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                <div class="mt-1">
-                    <select id="status" name="status" required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                        <option value="suspended" {{ old('status') == 'suspended' ? 'selected' : '' }}>Suspended</option>
-                    </select>
+                <div>
+                    <label for="expiry_date" class="block text-sm font-medium text-gray-700">Expiry Date</label>
+                    <div class="mt-1">
+                        <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date') }}" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                    </div>
+                    @error('expiry_date')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-                @error('status')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+
+                <div>
+                    <label for="renewal_cycle" class="block text-sm font-medium text-gray-700">Renewal Cycle</label>
+                    <div class="mt-1">
+                        <select id="renewal_cycle" name="renewal_cycle" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                            <option value="monthly" {{ old('renewal_cycle') == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                            <option value="quarterly" {{ old('renewal_cycle') == 'quarterly' ? 'selected' : '' }}>Quarterly</option>
+                            <option value="yearly" {{ old('renewal_cycle') == 'yearly' ? 'selected' : '' }}>Yearly</option>
+                            <option value="perpetual" {{ old('renewal_cycle') == 'perpetual' ? 'selected' : '' }}>Perpetual</option>
+                        </select>
+                    </div>
+                    @error('renewal_cycle')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                    <div class="mt-1">
+                        <select id="status" name="status" required
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                            <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Active</option>
+                            <option value="expired" {{ old('status') == 'expired' ? 'selected' : '' }}>Expired</option>
+                            <option value="suspended" {{ old('status') == 'suspended' ? 'selected' : '' }}>Suspended</option>
+                        </select>
+                    </div>
+                    @error('status')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div class="flex justify-end space-x-3">

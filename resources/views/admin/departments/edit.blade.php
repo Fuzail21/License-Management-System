@@ -48,13 +48,10 @@
                     <select id="status" name="status" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
 
-                        {{-- Check if the old value or the current department status is 'active' --}}
-                        <option value="active" {{ old('status', $department->status) == 'active' ? 'selected' : '' }}>
+                        <option value="active" {{ old('status', $department->status->value) == 'active' ? 'selected' : '' }}>
                             Active
                         </option>
-
-                        {{-- Check if the old value or the current department status is 'inactive' --}}
-                        <option value="inactive" {{ old('status', $department->status) == 'inactive' ? 'selected' : '' }}>
+                        <option value="inactive" {{ old('status', $department->status->value) == 'inactive' ? 'selected' : '' }}>
                             Inactive
                         </option>
                     </select>

@@ -24,11 +24,11 @@ class UpdateUserRequest extends FormRequest
         return [
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->route('user'),
+            'email' => 'required|email|unique:users,email,' . $this->route('user')->id,
             'phone' => 'nullable|string|max:20',
             'designation' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
-            'password' => 'nullable|string|min:8',
+            'password' => 'nullable|string|min:8|confirmed',
         ];
     }
 }

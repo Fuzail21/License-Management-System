@@ -13,7 +13,7 @@
             @method('PUT')
 
             <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                <label for="name" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
                 <div class="mt-1">
                     <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
@@ -24,7 +24,7 @@
             </div>
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email Address <span class="text-red-500">*</span></label>
                 <div class="mt-1">
                     <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
@@ -34,30 +34,31 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Password (Leave blank to keep
-                    current)</label>
-                <div class="mt-1">
-                    <input type="password" name="password" id="password"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password (Leave blank to keep current)</label>
+                    <div class="mt-1">
+                        <input type="password" name="password" id="password" minlength="8"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                    </div>
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-                @error('password')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <div class="mt-1">
+                        <input type="password" name="password_confirmation" id="password_confirmation" minlength="8"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                    </div>
+                </div>
             </div>
 
             <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                <label for="department_id" class="block text-sm font-medium text-gray-700">Department <span class="text-red-500">*</span></label>
                 <div class="mt-1">
-                    <input type="password" name="password_confirmation" id="password_confirmation"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                </div>
-            </div>
-
-            <div>
-                <label for="department_id" class="block text-sm font-medium text-gray-700">Department</label>
-                <div class="mt-1">
-                    <select id="department_id" name="department_id"
+                    <select id="department_id" name="department_id" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
                         <option value="">Select Department</option>
                         @foreach($departments as $department)
@@ -72,16 +73,42 @@
                 @enderror
             </div>
 
+            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <div class="mt-1">
+                        <input type="text" name="phone" id="phone" value="{{ old('phone', $user->phone) }}"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="+1 (555) 123-4567">
+                    </div>
+                    @error('phone')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="designation" class="block text-sm font-medium text-gray-700">Designation</label>
+                    <div class="mt-1">
+                        <input type="text" name="designation" id="designation" value="{{ old('designation', $user->designation) }}"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="Software Engineer">
+                    </div>
+                    @error('designation')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
             <div>
-                <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status <span class="text-red-500">*</span></label>
                 <div class="mt-1">
-                    <select id="role" name="role"
+                    <select id="status" name="status" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
-                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="active" {{ old('status', $user->status->value) == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status', $user->status->value) == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
-                @error('role')
+                @error('status')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

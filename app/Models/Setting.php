@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
+    protected $guarded = [];
+    public $timestamps = true;
+
     protected $fillable = [
         'app_name',
         'app_logo',

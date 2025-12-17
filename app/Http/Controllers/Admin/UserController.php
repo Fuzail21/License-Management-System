@@ -58,6 +58,7 @@ class UserController extends Controller
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
         
+        $data['head'] = $request->has('head') ? 1 : 0;
         User::create($data);
 
         return redirect()->route('admin.users.index')
@@ -94,7 +95,7 @@ class UserController extends Controller
         } else {
             $data['password'] = Hash::make($data['password']);
         }
-        
+        $user->head = $request->has('head') ? 1 : 0;
         $user->update($data);
 
         return redirect()->route('admin.users.index')

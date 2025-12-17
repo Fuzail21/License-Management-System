@@ -62,6 +62,10 @@
                     <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $user->updated_at->format('M d, Y') }}</dd>
                 </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Head of Department</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $user->head ? 'Yes' : 'No' }}</dd>
+                </div>
             </dl>
         </div>
     </div>

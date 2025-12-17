@@ -8,6 +8,13 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLicenseController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\UserFeedbackController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Route;
 
 // Redirect root to login
@@ -46,6 +53,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('renewals/create/{userLicense}', [LicenseRenewalController::class, 'create'])->name('renewals.create');
     Route::post('renewals/{userLicense}', [LicenseRenewalController::class, 'store'])->name('renewals.store');
 
-    Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
-    Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+
+    Route::get('reviews', [UserFeedbackController::class, 'index'])->name('reviews.index');
+
+    Route::post('feedback/satisfied', [UserFeedbackController::class, 'satisfied'])
+        ->name('feedback.satisfied');
+
+    Route::post('feedback/issue', [UserFeedbackController::class, 'issue'])
+        ->name('feedback.issue');
 });

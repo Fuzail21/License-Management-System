@@ -216,6 +216,14 @@
                         Renewals
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('admin.reviews.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                        <i class="bi bi-check"></i>
+                        Reviews
+                    </a>
+                </li>
             </ul>
         </nav>
     </div>

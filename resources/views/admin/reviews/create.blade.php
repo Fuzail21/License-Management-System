@@ -75,6 +75,40 @@ function feedbackForm() {
 
                         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start;">
 
+                            <label for="contact_name" style="width: 100%; text-align: left; font-weight: 500; margin-bottom: 4px;">
+                                Your Name
+                            </label>
+
+                            <input type="text" id="contact_name" placeholder="Your Name"
+                                   style="
+                                        width: 100%;
+                                        border: 1px solid #d1d5db;
+                                        border-radius: 6px;
+                                        padding: 0.5rem;
+                                        height: 2.5rem;
+                                        font-size: 0.875rem;
+                                        background-color: white;
+                                   ">
+
+                        </div>
+
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px;">
+                            <label for="contact_phone" style="width: 100%; text-align: left; font-weight: 500; margin-bottom: 4px;">
+                                Your Phone
+                            </label>
+                            <input type="text" id="contact_phone" placeholder="Your Phone"
+                                   style="
+                                        width: 100%;
+                                        border: 1px solid #d1d5db;
+                                        border-radius: 6px;
+                                        padding: 0.5rem;
+                                        height: 2.5rem;
+                                        font-size: 0.875rem;
+                                        background-color: white;
+                                   ">
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; margin-top: 12px;">
+
                             <select id="issue_type"
 
                                     style="
@@ -109,9 +143,7 @@ function feedbackForm() {
 
 
 
-                            <textarea id="issue_message"
-
-                                      placeholder="Please describe your issue here..."
+                            <textarea id="issue_message" placeholder="Please describe your issue here..."
 
                                       style="
 
@@ -140,11 +172,13 @@ function feedbackForm() {
                     confirmButtonText: 'Submit',
                     preConfirm: () => {
                         const issue_type = document.getElementById('issue_type').value;
+                        const contact_name = document.getElementById('contact_name').value;
+                        const contact_phone = document.getElementById('contact_phone').value;
                         const message = document.getElementById('issue_message').value;
                         if (!issue_type || !message) {
                             Swal.showValidationMessage(`Please fill in both fields`);
                         }
-                        return { issue_type, message };
+                        return { issue_type, contact_name, contact_phone, message };
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -157,7 +191,9 @@ function feedbackForm() {
                             body: JSON.stringify({
                                 satisfied: 0,
                                 issue_type: result.value.issue_type,
-                                message: result.value.message
+                                message: result.value.message,
+                                customer_name: result.value.contact_name,
+                                customer_phone: result.value.contact_phone
                             })
                         })
                         .then(response => {

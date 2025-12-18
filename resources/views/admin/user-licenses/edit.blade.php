@@ -28,48 +28,24 @@
                     {{ $userLicense->license->license_name }}
                 </div>
             </div>
+            <div>
+                <label for="assigned_date" class="block text-sm font-medium text-gray-700">
+                    Assigned Date
+                </label>
+                <div class="mt-1">
+                    <input
+                        type="date"
+                        name="assigned_date"
+                        id="assigned_date"
+                        value="{{ old('assigned_date', $userLicense->assigned_date->format('Y-m-d')) }}"
+                        readonly
+                        class="shadow-sm bg-gray-100 cursor-not-allowed
+                               focus:ring-0 focus:border-gray-300
+                               block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                </div>
+            </div>
 
             <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                    <div class="mt-1">
-                        <input type="date" name="start_date" id="start_date"
-                            value="{{ old('start_date', $userLicense->start_date->format('Y-m-d')) }}" required
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                    </div>
-                    @error('start_date')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="expiry_date" class="block text-sm font-medium text-gray-700">Expiry Date</label>
-                    <div class="mt-1">
-                        <input type="date" name="expiry_date" id="expiry_date"
-                            value="{{ old('expiry_date', $userLicense->expiry_date->format('Y-m-d')) }}" required
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                    </div>
-                    @error('expiry_date')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="renewal_cycle" class="block text-sm font-medium text-gray-700">Renewal Cycle</label>
-                    <div class="mt-1">
-                        <select id="renewal_cycle" name="renewal_cycle" required
-                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                            <option value="monthly" {{ old('renewal_cycle', $userLicense->renewal_cycle->value) == 'monthly' ? 'selected' : '' }}>Monthly</option>
-                            <option value="quarterly" {{ old('renewal_cycle', $userLicense->renewal_cycle->value) == 'quarterly' ? 'selected' : '' }}>Quarterly</option>
-                            <option value="yearly" {{ old('renewal_cycle', $userLicense->renewal_cycle->value) == 'yearly' ? 'selected' : '' }}>Yearly</option>
-                            <option value="perpetual" {{ old('renewal_cycle', $userLicense->renewal_cycle->value) == 'perpetual' ? 'selected' : '' }}>Perpetual</option>
-                        </select>
-                    </div>
-                    @error('renewal_cycle')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                     <div class="mt-1">

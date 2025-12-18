@@ -24,6 +24,8 @@ class StoreVendorRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'company_name' => 'nullable|string|max:255',
+            'contact_name' => 'nullable|string|max:255',
+            'job_designation' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',

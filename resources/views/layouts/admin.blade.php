@@ -95,10 +95,10 @@
                     User Licenses
                 </x-nav-link>
 
-                <x-nav-link :href="route('admin.renewals.index')" :active="request()->routeIs('admin.renewals.*')"
+                {{-- <x-nav-link :href="route('admin.renewals.index')" :active="request()->routeIs('admin.renewals.*')"
                     icon="arrow-path">
                     Renewals
-                </x-nav-link>
+                </x-nav-link> --}}
 
                 <x-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')"
                     icon="star">

@@ -25,9 +25,6 @@ class UpdateUserLicenseRequest extends FormRequest
             'user_id' => 'required|exists:users,id',
             'license_id' => 'required|exists:licenses,id',
             'assigned_date' => 'required|date',
-            'start_date' => 'required|date',
-            'expiry_date' => 'required|date|after:start_date',
-            'renewal_cycle' => 'required|in:monthly,yearly',
             'renewal_cost' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,expired,suspended',
         ];

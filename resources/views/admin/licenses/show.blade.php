@@ -34,8 +34,14 @@
                     </dd>
                 </div>
                 <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">License Type</dt>
-                    <dd class="mt-1 text-sm text-gray-900 capitalize">{{ $license->license_type->value }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">Renewal Type</dt>
+                    <dd class="mt-1 text-sm text-gray-900 capitalize">{{ $license->renewal_type }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Renewal Cycle</dt>
+                    <dd class="mt-1 text-sm text-gray-900 capitalize">
+                        {{ $license->renewal_cycle ?? 'N/A' }}
+                    </dd>
                 </div>
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Version</dt>
@@ -51,6 +57,12 @@
                     <dt class="text-sm font-medium text-gray-500">Max Users</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $license->max_users ?? 'Unlimited' }}</dd>
                 </div>
+
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Number of Licenses Assigned</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $license->number_license_assigned ?? 'N/A' }}</dd>
+                </div>
+
                 <div class="sm:col-span-2">
                     <dt class="text-sm font-medium text-gray-500">Description</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $license->description ?? 'N/A' }}</dd>
@@ -70,7 +82,6 @@
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -86,10 +97,6 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $userLicense->user->department->name ?? 'N/A' }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $userLicense->expiry_date->format('M d, Y') }}
-                                <x-expiry-badge :expiryDate="$userLicense->expiry_date" :status="$userLicense->status->value" />
-                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$userLicense->status->value" />
                             </td>

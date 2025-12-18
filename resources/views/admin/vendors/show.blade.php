@@ -37,6 +37,14 @@
                     <dd class="mt-1 text-sm text-gray-900">{{ $vendor->phone ?? 'N/A' }}</dd>
                 </div>
                 <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Contact Person</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $vendor->contact_name ?? 'N/A' }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Job Designation</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $vendor->job_designation ?? 'N/A' }}</dd>
+                </div>
+                <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Status</dt>
                     <dd class="mt-1 text-sm text-gray-900">
                         <x-status-badge :status="$vendor->status->value" />

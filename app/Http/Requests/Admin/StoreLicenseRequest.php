@@ -24,7 +24,9 @@ class StoreLicenseRequest extends FormRequest
         return [
             'vendor_id' => 'required|exists:vendors,id',
             'license_name' => 'required|string|max:255',
-            'license_type' => 'required|in:subscription,perpetual',
+            'renewal_type' => 'required|in:subscription,perpetual',
+            'renewal_cycle' => 'nullable|in:monthly,quarterly,yearly,perpetual',
+            'number_license_assigned' => 'nullable|integer|min:0',
             'version' => 'nullable|string|max:50',
             'max_users' => 'nullable|integer|min:1',
             'cost' => 'required|numeric|min:0',

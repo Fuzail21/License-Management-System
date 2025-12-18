@@ -82,6 +82,43 @@
                 @enderror
             </div>
 
+            <!-- Contact Person Details -->
+            <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-4">
+                <h3 class="text-lg font-semibold text-gray-700 pb-2">
+                    Contact Person Details
+                </h3>
+
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                    <div>
+                        <label for="contact_name" class="block text-sm font-medium text-gray-700">
+                            Contact Name
+                        </label>
+                        <div class="mt-1">
+                            <input type="text" name="contact_name" id="contact_name"
+                                value="{{ old('contact_name') }}"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                        </div>
+                        @error('contact_name')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="job_designation" class="block text-sm font-medium text-gray-700">
+                            Job Designation
+                        </label>
+                        <div class="mt-1">
+                            <input type="text" name="job_designation" id="job_designation"
+                                value="{{ old('job_designation') }}"
+                                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                        </div>
+                        @error('job_designation')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
             <div class="flex justify-end space-x-3">
                 <a href="{{ route('admin.vendors.index') }}"
                     class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">

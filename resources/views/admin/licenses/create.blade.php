@@ -42,23 +42,40 @@
 
             <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                 <div>
-                    <label for="license_type" class="block text-sm font-medium text-gray-700">License Type <span class="text-red-500">*</span></label>
+                    <label for="renewal_type" class="block text-sm font-medium text-gray-700">Renewal Type <span class="text-red-500">*</span></label>
                     <div class="mt-1">
-                        <select id="license_type" name="license_type" required
+                        <select id="renewal_type" name="renewal_type" required
                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                            <option value="subscription" {{ old('license_type') == 'subscription' ? 'selected' : '' }}>
+                            <option value="subscription" {{ old('renewal_type') == 'subscription' ? 'selected' : '' }}>
                                 Subscription</option>
-                            <option value="perpetual" {{ old('license_type') == 'perpetual' ? 'selected' : '' }}>Perpetual
+                            <option value="perpetual" {{ old('renewal_type') == 'perpetual' ? 'selected' : '' }}>Perpetual
                             </option>
                         </select>
                     </div>
-                    @error('license_type')
+                    @error('renewal_type')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label for="version" class="block text-sm font-medium text-gray-700">Version</label>
+                    <label for="renewal_cycle" class="block text-sm font-medium text-gray-700">Renewal Cycle</label>
+                    <div class="mt-1">
+                        <select id="renewal_cycle" name="renewal_cycle"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                            <option value="" {{ old('renewal_cycle') == '' ? 'selected' : '' }}>Select Cycle</option>
+                            <option value="monthly" {{ old('renewal_cycle') == 'monthly' ? 'selected' : '' }}>Monthly</option>
+                            <option value="quarterly" {{ old('renewal_cycle') == 'quarterly' ? 'selected' : '' }}>Quarterly</option>
+                            <option value="yearly" {{ old('renewal_cycle') == 'yearly' ? 'selected' : '' }}>Yearly</option>
+                            {{-- <option value="perpetual" {{ old('renewal_cycle') == 'perpetual' ? 'selected' : '' }}>Perpetual</option> --}}
+                        </select>
+                    </div>
+                    @error('renewal_cycle')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="version" class="block text-sm font-medium text-gray-700">Version / Type</label>
                     <div class="mt-1">
                         <input type="text" name="version" id="version" value="{{ old('version') }}"
                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border"
@@ -91,6 +108,21 @@
                             placeholder="0.00">
                     </div>
                     @error('cost')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="number_license_assigned" class="block text-sm font-medium text-gray-700">Number of Licenses<span class="text-red-500">*</span></label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        {{-- <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">{{ $appSetting->currency_symbol ?? '$' }}</span>
+                        </div> --}}
+                        <input type="number" name="number_license_assigned" id="number_license_assigned" value="{{ old('number_license_assigned') }}" step="1" required min="1"
+                            class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md p-2 border"
+                            placeholder="0.00">
+                    </div>
+                    @error('number_license_assigned')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

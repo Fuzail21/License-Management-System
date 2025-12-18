@@ -19,7 +19,9 @@ class License extends Model
     protected $fillable = [
         'vendor_id',
         'license_name',
-        'license_type',
+        'renewal_type',
+        'renewal_cycle',
+        'number_license_assigned',
         'version',
         'max_users',
         'cost',

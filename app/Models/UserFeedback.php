@@ -9,7 +9,7 @@ class UserFeedback extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'satisfied', 'issue_type', 'message'];
+    protected $fillable = ['user_id', 'satisfied', 'issue_type', 'message', 'customer_name', 'customer_phone'];
 
     public function user()
     {

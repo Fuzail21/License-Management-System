@@ -29,9 +29,6 @@
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry
-                            Date</th>
-                        <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
                         </th>
                         <th scope="col"
@@ -48,11 +45,8 @@
                                 {{ $userLicense->license->license_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $userLicense->license->vendor->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $userLicense->expiry_date->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$userLicense->status->value" />
-                                <x-expiry-badge :expiryDate="$userLicense->expiry_date" :status="$userLicense->status->value" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end items-center gap-3">

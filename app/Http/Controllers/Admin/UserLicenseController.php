@@ -54,9 +54,7 @@ class UserLicenseController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'license_id' => 'required|exists:licenses,id',
-            'start_date' => 'required|date',
-            'expiry_date' => 'required|date|after:start_date',
-            'renewal_cycle' => 'required|in:monthly,quarterly,yearly,perpetual',
+            'assigned_date' => 'required|date',
             'status' => 'required|in:active,expired,suspended',
         ]);
 
@@ -98,9 +96,7 @@ class UserLicenseController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'license_id' => 'required|exists:licenses,id',
-            'start_date' => 'required|date',
-            'expiry_date' => 'required|date|after:start_date',
-            'renewal_cycle' => 'required|in:monthly,quarterly,yearly,perpetual',
+            'assigned_date' => 'required|date',
             'status' => 'required|in:active,expired,suspended',
         ]);
 

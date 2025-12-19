@@ -72,7 +72,7 @@ class UserLicenseController extends Controller
      */
     public function show(UserLicense $userLicense)
     {
-        $userLicense->load(['user.department', 'license.vendor', 'renewals']);
+        $userLicense->load(['user.department', 'license.vendor', ]);
 
         return view('admin.user-licenses.show', compact('userLicense'));
     }

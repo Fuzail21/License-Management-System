@@ -17,15 +17,6 @@
                     </svg>
                     Edit
                 </a>
-                {{-- <a href="{{ route('admin.renewals.create', $userLicense) }}"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-black bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    Renew License
-                </a> --}}
             </div>
         </div>
 
@@ -64,14 +55,14 @@
                         </a>
                     </dd>
                 </div>
-                <div class="sm:col-span-1">
+                {{-- <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Vendor</dt>
                     <dd class="mt-1 text-sm text-gray-900">
                         <a href="{{ route('admin.vendors.show', $userLicense->license->vendor) }}" class="text-indigo-600 hover:text-indigo-900">
                             {{ $userLicense->license->vendor->name }}
                         </a>
                     </dd>
-                </div>
+                </div> --}}
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Renewal Type</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ ucfirst($userLicense->license->renewal_type) }}</dd>
@@ -103,7 +94,7 @@
             </dl>
         </div>
 
-        @if($userLicense->renewals->count() > 0)
+        {{-- @if($userLicense->renewals->count() > 0)
         <div class="px-5 py-4 border-t border-gray-200">
             <h4 class="text-md font-medium text-gray-900 mb-4">Renewal History</h4>
             <div class="overflow-x-auto">
@@ -139,6 +130,6 @@
                 </table>
             </div>
         </div>
-        @endif
+        @endif --}}
     </div>
 @endsection

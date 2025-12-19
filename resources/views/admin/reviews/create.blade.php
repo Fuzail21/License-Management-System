@@ -141,29 +141,7 @@ function feedbackForm() {
 
                             </select>
 
-
-
-                            <textarea id="issue_message" placeholder="Please describe your issue here..."
-
-                                      style="
-
-                                        width: 100%;
-
-                                        border: 1px solid #d1d5db;
-
-                                        border-radius: 6px;
-
-                                        padding: 0.5rem;
-
-                                        font-size: 0.875rem;
-
-                                        height: 100px;
-
-                                        resize: none;
-
-                                      ">
-
-                            </textarea>
+                            <textarea id="issue_message" placeholder="Please describe your issue here..." style="width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 0.5rem; font-size: 0.875rem; height: 100px; resize: none; background-color: white;"></textarea>
 
                         </div>
 

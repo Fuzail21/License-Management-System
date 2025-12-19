@@ -86,9 +86,6 @@
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry
-                        </th>
-                        <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
                         </th>
                         <th scope="col"
@@ -109,10 +106,6 @@
                                 <a href="{{ route('admin.vendors.show', $userLicense->license->vendor) }}" class="text-indigo-600 hover:text-indigo-900">
                                     {{ $userLicense->license->vendor->name }}
                                 </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $userLicense->expiry_date->format('M d, Y') }}
-                                <x-expiry-badge :expiryDate="$userLicense->expiry_date" :status="$userLicense->status->value" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$userLicense->status->value" />

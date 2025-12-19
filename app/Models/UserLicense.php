@@ -62,10 +62,10 @@ class UserLicense extends Model
     /**
      * Get the renewals for the user license.
      */
-    public function renewals(): HasMany
-    {
-        return $this->hasMany(LicenseRenewal::class);
-    }
+    // public function renewals(): HasMany
+    // {
+    //     return $this->hasMany(LicenseRenewal::class);
+    // }
 }
 
 enum RenewalCycle: string

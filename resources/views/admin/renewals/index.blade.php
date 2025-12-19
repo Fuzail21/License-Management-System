@@ -23,8 +23,7 @@
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Renewal
                             Date</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">New
-                            Expiry</th>
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry</th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
                         <th scope="col"
@@ -36,12 +35,12 @@
                     @forelse($renewals as $renewal)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <a href="{{ route('admin.user-licenses.show', $renewal->userLicense) }}" class="text-indigo-600 hover:text-indigo-900">
-                                    {{ $renewal->userLicense->license->license_name }}
+                                <a href="{{ route('admin.licenses.show', $renewal->license) }}" class="text-indigo-600 hover:text-indigo-900">
+                                    {{ $renewal->license->license_name }}
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $renewal->userLicense->license->vendor->name }}
+                                {{ $renewal->license->vendor->name }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $renewal->renewed_at->format('M d, Y') }}</td>
@@ -50,7 +49,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $appSetting->currency_symbol ?? '$' }}{{ number_format($renewal->renewal_cost, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.user-licenses.show', $renewal->userLicense) }}"
+                                <a href="{{ route('admin.licenses.show', $renewal->license) }}"
                                     class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200" title="View License">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">

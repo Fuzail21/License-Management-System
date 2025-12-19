@@ -17,8 +17,7 @@ class LicenseRenewal extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'user_license_id',
-        'old_expiry_date',
+        'license_id',
         'new_expiry_date',
         'renewal_cost',
         'renewed_by',
@@ -44,9 +43,12 @@ class LicenseRenewal extends Model
     /**
      * Get the user license that owns the renewal.
      */
-    public function userLicense(): BelongsTo
+    /**
+     * Get the license that this renewal belongs to.
+     */
+    public function license(): BelongsTo
     {
-        return $this->belongsTo(UserLicense::class);
+        return $this->belongsTo(License::class, 'license_id');
     }
 
     public function renewer()
@@ -54,5 +56,20 @@ class LicenseRenewal extends Model
         // Assuming your User model is App\Models\User
         // and the foreign key is 'renewed_by'
         return $this->belongsTo(User::class, 'renewed_by');
+    }
+
+    /**
+     * Compatibility accessors to match existing view field names.
+     * - `renewal_date` maps to `renewed_at`
+     * - `cost` maps to `renewal_cost`
+     */
+    public function getRenewalDateAttribute()
+    {
+        return $this->renewed_at;
+    }
+
+    public function getCostAttribute()
+    {
+        return $this->renewal_cost;
     }
 }

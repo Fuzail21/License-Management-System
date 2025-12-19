@@ -20,9 +20,9 @@ class DashboardController extends Controller
             'vendors' => Vendor::where('status', 'active')->count(),
             'licenses' => License::count(),
             'active_licenses' => UserLicense::where('status', 'active')->count(),
-            'expiring_soon' => UserLicense::where('status', 'active')
-                ->whereBetween('expiry_date', [now(), now()->addDays(30)])
-                ->count(),
+            // 'expiring_soon' => UserLicense::where('status', 'active')
+            //     ->whereBetween('expiry_date', [now(), now()->addDays(30)])
+            //     ->count(),
             'expired' => UserLicense::where('status', 'expired')->count(),
         ];
 

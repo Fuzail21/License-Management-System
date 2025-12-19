@@ -115,26 +115,6 @@
             </div>
         </div>
 
-        <!-- Expiring Soon -->
-        <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-yellow-500">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <svg class="h-6 w-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Expiring Soon (≤30 days)</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ $stats['expiring_soon'] }}</dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Expired -->
         <div class="bg-white overflow-hidden shadow rounded-lg border-l-4 border-red-500">
             <div class="p-5">
@@ -190,8 +170,6 @@
                                 {{ $userLicense->license->license_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $userLicense->license->vendor->name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $userLicense->expiry_date->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$userLicense->status->value" />
                                 <x-expiry-badge :expiryDate="$userLicense->expiry_date" :status="$userLicense->status->value" />

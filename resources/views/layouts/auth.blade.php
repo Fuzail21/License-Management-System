@@ -29,8 +29,8 @@
         <div
             class="w-full sm:max-w-md mt-6 px-6 py-8 bg-white shadow-2xl overflow-hidden sm:rounded-xl backdrop-blur-sm bg-opacity-95">
             <div class="flex justify-center mb-6">
-                @if($appSetting->app_logo)
-                    <img src="{{ Storage::url($appSetting->app_logo) }}" alt="Logo" class="h-12 w-auto">
+                @if(isset($appSetting) && $appSetting->hasLogo())
+                    <img src="{{ $appSetting->logo_url }}" alt="Logo" class="h-12 w-auto" onerror="this.style.display='none'">
                 @else
                     <div class="p-3 bg-indigo-100 rounded-full">
                         <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

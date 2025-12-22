@@ -47,8 +47,8 @@
             <div class="flex items-center justify-center h-16 border-b border-gray-200 px-4">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-2 text-xl font-bold {{ $primaryColor }}">
-                    @if($appSetting && $appSetting->app_logo)
-                        <img src="{{ Storage::url($appSetting->app_logo) }}" alt="Logo" class="h-8 w-auto">
+                    @if(isset($appSetting) && $appSetting->hasLogo())
+                        <img src="{{ $appSetting->logo_url }}" alt="Logo" class="h-8 w-auto" onerror="this.style.display='none'">
                     @else
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

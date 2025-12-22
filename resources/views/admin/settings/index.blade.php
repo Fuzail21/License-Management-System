@@ -37,7 +37,7 @@
                         @error('app_logo') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
 
-                    <div class="sm:col-span-3">
+                    {{-- <div class="sm:col-span-3">
                         <label for="primary_color" class="block text-sm font-medium text-gray-700">Primary Color</label>
                         <div class="mt-1 flex items-center gap-2">
                             <input type="color" name="primary_color" id="primary_color"
@@ -61,12 +61,12 @@
                                 class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border uppercase">
                         </div>
                         @error('secondary_color') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                    </div>
+                    </div> --}}
                 </div>
             </div>
 
             <!-- Regional Settings -->
-            <div>
+            {{-- <div>
                 <h3 class="text-lg font-medium leading-6 text-gray-900 border-b pb-2 mb-4">Regional Settings</h3>
                 <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     <div class="sm:col-span-2">
@@ -106,7 +106,7 @@
                         @error('timezone') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Contact Information -->
             <div>

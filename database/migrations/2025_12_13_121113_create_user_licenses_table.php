@@ -16,9 +16,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('license_id')->constrained('licenses')->onDelete('cascade');
             $table->date('assigned_date');
-            $table->date('start_date');
-            $table->date('expiry_date');
-            $table->enum('renewal_cycle', ['monthly', 'yearly']);
             $table->decimal('renewal_cost', 10, 2)->nullable();
             $table->timestamp('renewed_at')->nullable();
             $table->enum('status', ['active', 'expired', 'suspended'])->default('active');
@@ -27,7 +24,6 @@ return new class extends Migration
             $table->index('user_id');
             $table->index('license_id');
             $table->index('status');
-            $table->index('expiry_date');
         });
     }
 

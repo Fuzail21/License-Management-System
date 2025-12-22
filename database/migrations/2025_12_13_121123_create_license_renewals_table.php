@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('license_renewals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_license_id')->constrained('user_licenses')->onDelete('cascade');
-            $table->date('old_expiry_date');
+            $table->foreignId('license_id')->constrained('licenses')->onDelete('cascade');
+            $table->date('old_expiry_date')->nullable();
             $table->date('new_expiry_date');
             $table->decimal('renewal_cost', 10, 2);
             $table->string('renewed_by')->nullable();
@@ -22,7 +22,6 @@ return new class extends Migration
             $table->timestamp('renewed_at');
             $table->timestamps();
 
-            $table->index('user_license_id');
             $table->index('renewed_at');
         });
     }

@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('user_feedback', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('customer_name')->nullable()->after('user_id');
+            $table->string('customer_phone', 20)->nullable()->after('customer_name');
             $table->boolean('satisfied')->comment('1 = Yes, 0 = No');
             $table->string('issue_type')->nullable();
             $table->text('message')->nullable();

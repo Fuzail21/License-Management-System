@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
             $table->string('license_name');
-            $table->enum('license_type', ['subscription', 'perpetual']);
+            $table->enum('renewal_type', ['subscription', 'perpetual']);
+            $table->string('renewal_cycle')
+                  ->nullable()
+                  ->comment('e.g. monthly, yearly, lifetime');
+            $table->unsignedInteger('number_license_assigned')
+                  ->default(0);
             $table->string('version')->nullable();
             $table->integer('max_users')->nullable();
             $table->decimal('cost', 10, 2);
@@ -23,7 +28,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('vendor_id');
-            $table->index('license_type');
         });
     }
 

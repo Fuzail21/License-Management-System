@@ -12,15 +12,15 @@ class Setting extends Model
     protected $fillable = [
         'app_name',
         'app_logo',
-        'primary_color',
-        'secondary_color',
-        'currency_name',
-        'currency_symbol',
+        // 'primary_color',
+        // 'secondary_color',
+        // 'currency_name',
+        // 'currency_symbol',
         'support_email',
-        'support_phone',
+        // 'support_phone',
         'address',
         'footer_text',
-        'timezone',
+        // 'timezone',
     ];
 
     /**

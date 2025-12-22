@@ -20,15 +20,15 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'app_name'         => 'required|string|max:255',
             'app_logo'         => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
-            'primary_color'    => 'required|string|regex:/^#[a-fA-F0-9]{6}$/',
-            'secondary_color'  => 'required|string|regex:/^#[a-fA-F0-9]{6}$/',
-            'currency_name'    => 'required|string|max:10',
-            'currency_symbol'  => 'required|string|max:5',
+            'primary_color'    => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
+            'secondary_color'  => 'nullable|string|regex:/^#[a-fA-F0-9]{6}$/',
+            'currency_name'    => 'nullable|string|max:10',
+            'currency_symbol'  => 'nullable|string|max:5',
             'support_email'    => 'nullable|email|max:255',
             'support_phone'    => 'nullable|string|max:20',
             'address'          => 'nullable|string',
             'footer_text'      => 'nullable|string',
-            'timezone'         => 'required|string|timezone',
+            'timezone'         => 'nullable|string|timezone',
         ]);
 
         $settings = Setting::first();

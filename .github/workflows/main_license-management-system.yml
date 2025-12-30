@@ -79,6 +79,6 @@ jobs:
         with:
           app-name: 'license-management-system'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_LICENSE_MANAGEMENT_SYSTEM }}
           package: .
           

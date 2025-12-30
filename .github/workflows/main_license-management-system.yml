@@ -65,6 +65,5 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'license-management-system'
-          slot-name: 'Production'
           package: .
           

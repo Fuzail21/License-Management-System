@@ -22,12 +22,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: sqlsrv, pdo_sqlsrv, mbstring, xml, bcmath, curl, zip, gd
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Check if composer.json exists
         id: check_files
@@ -37,25 +31,8 @@ jobs:
 
       - name: Run composer install if composer.json exists
         if: steps.check_files.outputs.files_exists == 'true'
-        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
+        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
 
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build frontend assets
-        run: npm run build
-
-      - name: Setup Laravel
-        run: |
-          cp .env.example .env || true
-          php artisan key:generate --force || true
-          chmod +x startup.sh || true
-
-      - name: Cleanup for deployment
-        run: |
-          rm -rf node_modules
-          rm -rf .git
-          rm -rf tests
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -66,12 +43,22 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: php-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9DF21AD6CDE64F6FB9BF98234015DC3D }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B57CB0DB183A4E6DADD5C0D0A7E5EBE9 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_844533EC475A44BCA6BA2160BC5C1A12 }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -79,6 +66,5 @@ jobs:
         with:
           app-name: 'license-management-system'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
           

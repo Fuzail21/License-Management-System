@@ -22,6 +22,12 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+          extensions: sqlsrv, pdo_sqlsrv, mbstring, xml, bcmath, curl, zip, gd
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Check if composer.json exists
         id: check_files
@@ -31,8 +37,25 @@ jobs:
 
       - name: Run composer install if composer.json exists
         if: steps.check_files.outputs.files_exists == 'true'
-        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress
+        run: composer validate --no-check-publish && composer install --prefer-dist --no-progress --no-dev --optimize-autoloader
 
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Setup Laravel
+        run: |
+          cp .env.example .env || true
+          php artisan key:generate --force || true
+          chmod +x startup.sh || true
+
+      - name: Cleanup for deployment
+        run: |
+          rm -rf node_modules
+          rm -rf .git
+          rm -rf tests
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4

@@ -20,6 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'role_id',
         'department_id',
         'name',
         'email',
@@ -63,11 +64,27 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the role that the user belongs to.
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
      * Get the user licenses for the user.
      */
     public function userLicenses(): HasMany
     {
         return $this->hasMany(UserLicense::class);
+    }
+
+    /**
+     * Get the divisions managed by this user (as GM).
+     */
+    public function managedDivisions(): HasMany
+    {
+        return $this->hasMany(Division::class, 'gm_id');
     }
 }
 

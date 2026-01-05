@@ -21,6 +21,7 @@ class LicenseRenewal extends Model
         'new_expiry_date',
         'renewal_cost',
         'renewed_by',
+        'renewed_by_employee_id',
         'notes',
         'renewed_at',
     ];
@@ -56,6 +57,14 @@ class LicenseRenewal extends Model
         // Assuming your User model is App\Models\User
         // and the foreign key is 'renewed_by'
         return $this->belongsTo(User::class, 'renewed_by');
+    }
+
+    /**
+     * Get the employee who performed the renewal.
+     */
+    public function renewedByEmployee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'renewed_by_employee_id');
     }
 
     /**

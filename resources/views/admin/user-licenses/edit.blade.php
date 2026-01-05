@@ -12,13 +12,13 @@
             @csrf
             @method('PUT')
 
-            <input type="hidden" name="user_id" value="{{ $userLicense->user_id }}">
+            <input type="hidden" name="employee_id" value="{{ $userLicense->employee_id }}">
             <input type="hidden" name="license_id" value="{{ $userLicense->license_id }}">
 
             <div>
-                <label class="block text-sm font-medium text-gray-700">User</label>
+                <label class="block text-sm font-medium text-gray-700">Employee</label>
                 <div class="mt-1 p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-700">
-                    {{ $userLicense->user->name }}
+                    {{ $userLicense->employee->name }}
                 </div>
             </div>
 

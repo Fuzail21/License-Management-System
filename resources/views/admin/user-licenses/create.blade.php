@@ -12,19 +12,19 @@
             @csrf
 
             <div>
-                <label for="user_id" class="block text-sm font-medium text-gray-700">User</label>
+                <label for="employee_id" class="block text-sm font-medium text-gray-700">Employee</label>
                 <div class="mt-1">
-                    <select id="user_id" name="user_id" required
+                    <select id="employee_id" name="employee_id" required
                         class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                        <option value="">Select User</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }} ({{ $user->email }})
+                        <option value="">Select Employee</option>
+                        @foreach($employees as $employee)
+                            <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                                {{ $employee->name }} ({{ $employee->email }})
                             </option>
                         @endforeach
                     </select>
                 </div>
-                @error('user_id')
+                @error('employee_id')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

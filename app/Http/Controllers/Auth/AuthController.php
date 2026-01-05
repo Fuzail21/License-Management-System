@@ -80,10 +80,19 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): RedirectResponse
     {
+        // Get default role (Staff)
+        $defaultRole = \App\Models\Role::where('name', 'Staff')->first();
+
+        // If Staff role doesn't exist, use first available role
+        if (!$defaultRole) {
+            $defaultRole = \App\Models\Role::first();
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password, // Auto-hashed by model cast
+            'role_id' => $defaultRole?->id,
             'department_id' => $request->department_id,
             'phone' => $request->phone,
             'designation' => $request->designation,

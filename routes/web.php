@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\DivisionController;
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\LicenseRenewalController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLicenseController;
 use App\Http\Controllers\Admin\VendorController;
@@ -27,8 +30,8 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+    // Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    // Route::post('/register', [AuthController::class, 'register']);
 });
 
 // Logout Route (Auth Middleware)
@@ -41,7 +44,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('departments', DepartmentController::class);
-    Route::resource('users', UserController::class);
+    Route::resource('divisions', DivisionController::class);
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('roles', RoleController::class);
 
     Route::resource('vendors', VendorController::class);
 
@@ -53,8 +58,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('renewals/create/{license}', [LicenseRenewalController::class, 'create'])->name('renewals.create');
     Route::post('renewals/{license}', [LicenseRenewalController::class, 'store'])->name('renewals.store');
 
-    Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+    // Admin-only routes (requires Admin role)
+    Route::middleware('admin')->group(function () {
+        Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
+
+        Route::resource('users', UserController::class);
+    });
 
     Route::get('reviews', [UserFeedbackController::class, 'index'])->name('reviews.index');
 

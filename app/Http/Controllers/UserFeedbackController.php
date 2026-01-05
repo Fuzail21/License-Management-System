@@ -20,17 +20,18 @@ class UserFeedbackController extends Controller
 
     public function satisfied(Request $request)
     {
-        // 1. Remove dd($request->all()); it will break your JS fetch!
-
         $request->validate([
             'satisfied' => 'required|boolean',
         ]);
 
-        UserFeedback::create([
-            'user_id'   => auth()->id(),
-            'satisfied' => $request->boolean('satisfied'),
-        ]);
+        // Get employee_id from authenticated user if exists
+        $employeeId = \App\Models\Employee::where('email', auth()->user()->email)->first()?->id;
 
+        UserFeedback::create([
+            'user_id'     => auth()->id(),
+            'employee_id' => $employeeId,
+            'satisfied'   => $request->boolean('satisfied'),
+        ]);
 
         // Return JSON instead of redirecting
         return response()->json(['success' => true, 'message' => 'Feedback saved']);
@@ -45,13 +46,17 @@ class UserFeedbackController extends Controller
             'customer_phone' => 'nullable|string|max:20',
         ]);
 
+        // Get employee_id from authenticated user if exists
+        $employeeId = \App\Models\Employee::where('email', auth()->user()->email)->first()?->id;
+
         UserFeedback::create([
-            'user_id' => auth()->id(),
-            'satisfied' => 0,
-            'customer_name' => $request->customer_name,
+            'user_id'        => auth()->id(),
+            'employee_id'    => $employeeId,
+            'satisfied'      => 0,
+            'customer_name'  => $request->customer_name,
             'customer_phone' => $request->customer_phone,
-            'issue_type' => $request->issue_type,
-            'message' => $request->message,
+            'issue_type'     => $request->issue_type,
+            'message'        => $request->message,
         ]);
 
         // CHANGE THIS: Instead of redirect()->back()

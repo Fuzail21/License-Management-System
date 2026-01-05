@@ -34,6 +34,25 @@
             </div>
 
             <div>
+                <label for="division_id" class="block text-sm font-medium text-gray-700">Division</label>
+                <div class="mt-1">
+                    <select id="division_id" name="division_id"
+                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                        <option value="">-- Select Division (Optional) --</option>
+                        @foreach($divisions as $division)
+                            <option value="{{ $division->id }}" {{ old('division_id') == $division->id ? 'selected' : '' }}>
+                                {{ $division->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @error('division_id')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-sm text-gray-500">Assign this department to a division.</p>
+            </div>
+
+            <div>
                 <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                 <div class="mt-1">
                     <select id="status" name="status" required

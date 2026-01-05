@@ -23,23 +23,23 @@
         <div class="px-5 py-4">
             <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                 <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">User</dt>
+                    <dt class="text-sm font-medium text-gray-500">Employee</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        <a href="{{ route('admin.users.show', $userLicense->user) }}" class="text-indigo-600 hover:text-indigo-900">
-                            {{ $userLicense->user->name }}
+                        <a href="{{ route('admin.employees.show', $userLicense->employee) }}" class="text-indigo-600 hover:text-indigo-900">
+                            {{ $userLicense->employee->name }}
                         </a>
                     </dd>
                 </div>
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Email</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $userLicense->user->email }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $userLicense->employee->email }}</dd>
                 </div>
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Department</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        @if($userLicense->user->department)
-                            <a href="{{ route('admin.departments.show', $userLicense->user->department) }}" class="text-indigo-600 hover:text-indigo-900">
-                                {{ $userLicense->user->department->name }}
+                        @if($userLicense->employee->department)
+                            <a href="{{ route('admin.departments.show', $userLicense->employee->department) }}" class="text-indigo-600 hover:text-indigo-900">
+                                {{ $userLicense->employee->department->name }}
                             </a>
                         @else
                             <span class="text-gray-400">No department</span>

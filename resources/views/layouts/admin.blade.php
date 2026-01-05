@@ -76,9 +76,9 @@
                     Departments
                 </x-nav-link>
 
-                <x-nav-link :href="route('admin.employees.index')" :active="request()->routeIs('admin.employees.*')"
+                <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"
                     icon="users">
-                    Employees
+                    Users
                 </x-nav-link>
 
                 <x-nav-link :href="route('admin.vendors.index')" :active="request()->routeIs('admin.vendors.*')"
@@ -101,42 +101,19 @@
                     Renewals
                 </x-nav-link>
 
-                @if(auth()->user()->role && auth()->user()->role->name === 'Admin')
-                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"
-                        icon="users">
-                        Users
-                    </x-nav-link>
-                @endif
                 {{-- <x-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')"
                     icon="star">
                     Reviews
                 </x-nav-link> --}}
 
                 <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Organization
+                    System
                 </div>
 
-                <x-nav-link :href="route('admin.divisions.index')" :active="request()->routeIs('admin.divisions.*')"
-                    icon="building-office-2">
-                    Divisions
+                <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')"
+                    icon="cog-6-tooth">
+                    Settings
                 </x-nav-link>
-
-                <x-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')"
-                    icon="user-group">
-                    Roles
-                </x-nav-link>
-
-                @if(auth()->user()->role && auth()->user()->role->name === 'Admin')
-
-                    <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        System
-                    </div>
-
-                    <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')"
-                        icon="cog-6-tooth">
-                        Settings
-                    </x-nav-link>
-                @endif
             </nav>
 
             <!-- Footer -->

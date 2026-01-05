@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Employee;
 use App\Models\License;
+use App\Models\User;
 use App\Models\UserLicense;
 use Illuminate\Http\Request;
 
@@ -15,11 +15,11 @@ class UserLicenseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = UserLicense::with(['employee.department', 'license.vendor']);
+        $query = UserLicense::with(['user.department', 'license.vendor']);
 
-        // Filter by employee
-        if ($request->filled('employee_id')) {
-            $query->where('employee_id', $request->employee_id);
+        // Filter by user
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
 
         // Filter by status
@@ -28,9 +28,9 @@ class UserLicenseController extends Controller
         }
 
         $userLicenses = $query->latest()->paginate(15);
-        $employees = Employee::where('status', 'active')->orderBy('name')->get();
+        $users = User::where('status', 'active')->orderBy('name')->get();
 
-        return view('admin.user-licenses.index', compact('userLicenses', 'employees'));
+        return view('admin.user-licenses.index', compact('userLicenses', 'users'));
     }
 
     /**
@@ -38,12 +38,12 @@ class UserLicenseController extends Controller
      */
     public function create(Request $request)
     {
-        $employees = Employee::where('status', 'active')->orderBy('name')->get();
+        $users = User::where('status', 'active')->orderBy('name')->get();
         $licenses = License::with('vendor')->get();
 
         $selectedLicenseId = $request->get('license_id');
 
-        return view('admin.user-licenses.create', compact('employees', 'licenses', 'selectedLicenseId'));
+        return view('admin.user-licenses.create', compact('users', 'licenses', 'selectedLicenseId'));
     }
 
     /**
@@ -52,7 +52,7 @@ class UserLicenseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
+            'user_id' => 'required|exists:users,id',
             'license_id' => 'required|exists:licenses,id',
             'assigned_date' => 'required|date',
             'status' => 'required|in:active,expired,suspended',
@@ -72,7 +72,7 @@ class UserLicenseController extends Controller
      */
     public function show(UserLicense $userLicense)
     {
-        $userLicense->load(['employee.department', 'license.vendor']);
+        $userLicense->load(['user.department', 'license.vendor', ]);
 
         return view('admin.user-licenses.show', compact('userLicense'));
     }
@@ -82,10 +82,10 @@ class UserLicenseController extends Controller
      */
     public function edit(UserLicense $userLicense)
     {
-        $employees = Employee::where('status', 'active')->orderBy('name')->get();
+        $users = User::where('status', 'active')->orderBy('name')->get();
         $licenses = License::with('vendor')->get();
 
-        return view('admin.user-licenses.edit', compact('userLicense', 'employees', 'licenses'));
+        return view('admin.user-licenses.edit', compact('userLicense', 'users', 'licenses'));
     }
 
     /**
@@ -94,7 +94,7 @@ class UserLicenseController extends Controller
     public function update(Request $request, UserLicense $userLicense)
     {
         $validated = $request->validate([
-            'employee_id' => 'required|exists:employees,id',
+            'user_id' => 'required|exists:users,id',
             'license_id' => 'required|exists:licenses,id',
             'assigned_date' => 'required|date',
             'status' => 'required|in:active,expired,suspended',

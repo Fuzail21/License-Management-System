@@ -21,7 +21,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">License
                         </th>
@@ -40,7 +40,7 @@
                     @forelse($userLicenses as $userLicense)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $userLicense->employee->name }}</td>
+                                {{ $userLicense->user->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $userLicense->license->license_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

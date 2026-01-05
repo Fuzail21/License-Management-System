@@ -73,7 +73,7 @@
                     </dd>
                 </div>
                 <div class="sm:col-span-1">
-                    <dt class="text-sm font-medium text-gray-500">Max Employees</dt>
+                    <dt class="text-sm font-medium text-gray-500">Max Users</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $license->max_users ?? 'Unlimited' }}</dd>
                 </div>
 
@@ -93,13 +93,13 @@
     @if($license->userLicenses->count() > 0)
     <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-200">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Assigned Employees ({{ $license->userLicenses->count() }})</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Assigned Users ({{ $license->userLicenses->count() }})</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -109,13 +109,13 @@
                     @foreach($license->userLicenses as $userLicense)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <a href="{{ route('admin.employees.show', $userLicense->employee) }}"
+                                <a href="{{ route('admin.users.show', $userLicense->user) }}"
                                     class="text-indigo-600 hover:text-indigo-900">
-                                    {{ $userLicense->employee->name }}
+                                    {{ $userLicense->user->name }}
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $userLicense->employee->department->name ?? 'N/A' }}</td>
+                                {{ $userLicense->user->department->name ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$userLicense->status->value" />
                             </td>

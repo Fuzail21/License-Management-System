@@ -18,7 +18,6 @@ class UserLicense extends Model
      */
     protected $fillable = [
         'user_id',
-        'employee_id',
         'license_id',
         'assigned_date',
         'renewal_cost',
@@ -50,14 +49,6 @@ class UserLicense extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Get the employee that owns the license assignment.
-     */
-    public function employee(): BelongsTo
-    {
-        return $this->belongsTo(Employee::class);
     }
 
     /**

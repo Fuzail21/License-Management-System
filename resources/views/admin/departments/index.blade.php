@@ -23,10 +23,6 @@
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                         <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Division</th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employees</th>
-                        <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
                         </th>
                         <th scope="col" colspan="2"
@@ -38,14 +34,6 @@
                     @forelse($departments as $department)
                         <tr>
                             <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{{ $department->name }}
-                            </td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                {{ $department->division ? $department->division->name : 'Not Assigned' }}
-                            </td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $department->employees_count }} {{ Str::plural('employee', $department->employees_count) }}
-                                </span>
                             </td>
                             <td class="px-6 py-3 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$department->status->value" />
@@ -85,7 +73,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No departments
+                            <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No departments
                                 found</td>
                         </tr>
                     @endforelse

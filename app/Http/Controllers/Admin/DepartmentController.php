@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDepartmentRequest;
 use App\Http\Requests\Admin\UpdateDepartmentRequest;
 use App\Models\Department;
-use App\Models\Division;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
@@ -29,7 +28,7 @@ class DepartmentController extends Controller
             });
         }
 
-        $departments = $query->with('division')->withCount('employees')->orderBy('created_at', 'desc')->paginate(15);
+        $departments = $query->withCount('users')->orderBy('created_at', 'desc')->paginate(15);
 
         return view('admin.departments.index', compact('departments'));
     }
@@ -39,8 +38,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $divisions = Division::orderBy('name')->get();
-        return view('admin.departments.create', compact('divisions'));
+        return view('admin.departments.create');
     }
 
     /**
@@ -59,7 +57,7 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        $department->load('employees');
+        $department->load('users');
         return view('admin.departments.show', compact('department'));
     }
 
@@ -68,8 +66,7 @@ class DepartmentController extends Controller
      */
     public function edit(Department $department)
     {
-        $divisions = Division::orderBy('name')->get();
-        return view('admin.departments.edit', compact('department', 'divisions'));
+        return view('admin.departments.edit', compact('department'));
     }
 
     /**

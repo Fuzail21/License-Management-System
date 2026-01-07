@@ -85,7 +85,7 @@
                                 </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                                {{ $license->license_type->value }}</td>
+                                {{ $license->renewal_type }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $license->version ?? 'N/A' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

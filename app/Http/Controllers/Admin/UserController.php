@@ -49,7 +49,9 @@ class UserController extends Controller
     {
         $departments = Department::where('status', 'active')->get();
         $roles = Role::orderBy('name')->get();
-        return view('admin.users.create', compact('departments', 'roles'));
+        $managerRoleId = Role::where('name', 'Manager')->value('id');
+
+        return view('admin.users.create', compact('departments', 'roles', 'managerRoleId'));
     }
 
     /**
@@ -58,10 +60,19 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        // $data['password'] = Hash::make($data['password']);
-        $data['password'] = '$2y$12$XIjmF0nelV7wXAOcBnVb7OGj03nUYttOie9sJj3A3UydTY/Bv2eG6';
-        
-        $data['head'] = $request->has('head') ? 1 : 0;
+        $data['password'] = Hash::make($data['password']);
+
+        // Enforce can_create_license logic (security)
+        $managerRole = Role::where('name', 'Manager')->first();
+
+        if ($request->role_id == $managerRole->id) {
+            // Only managers can have license create access
+            $data['can_create_license'] = $request->boolean('can_create_license');
+        } else {
+            // Force false for non-managers (security enforcement)
+            $data['can_create_license'] = false;
+        }
+
         User::create($data);
 
         return redirect()->route('admin.users.index')
@@ -84,7 +95,9 @@ class UserController extends Controller
     {
         $departments = Department::where('status', 'active')->get();
         $roles = Role::orderBy('name')->get();
-        return view('admin.users.edit', compact('user', 'departments', 'roles'));
+        $managerRoleId = Role::where('name', 'Manager')->value('id');
+
+        return view('admin.users.edit', compact('user', 'departments', 'roles', 'managerRoleId'));
     }
 
     /**
@@ -93,13 +106,42 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-        
-        // if (empty($data['password'])) {
-        //     unset($data['password']);
-        // } else {
-        //     $data['password'] = Hash::make($data['password']);
-        // }
-        // $data['password'] = '$2y$12$XIjmF0nelV7wXAOcBnVb7OGj03nUYttOie9sJj3A3UydTY/Bv2eG6';
+
+        if (empty($data['password'])) {
+            unset($data['password']);
+        } else {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        // Enforce can_create_license logic (security)
+        $managerRole = Role::where('name', 'Manager')->first();
+        $oldCanCreateLicense = $user->can_create_license;
+
+        if ($request->role_id == $managerRole->id) {
+            // Only managers can have license create access
+            $data['can_create_license'] = $request->boolean('can_create_license');
+
+            // Warn if disabling access while pending licenses exist
+            if ($oldCanCreateLicense && !$data['can_create_license']) {
+                $pendingCount = $user->getPendingLicensesCount();
+                if ($pendingCount > 0) {
+                    session()->flash('warning', "This manager has {$pendingCount} pending licenses. Disabling access will not affect existing pending requests.");
+                }
+            }
+        } else {
+            // Force false for non-managers (security enforcement)
+            $data['can_create_license'] = false;
+
+            // Log if role changed from manager
+            if ($user->isDirty('role_id') && $user->isManager()) {
+                \Log::info('Revoked license create access due to role change', [
+                    'user_id' => $user->id,
+                    'old_role_id' => $user->getOriginal('role_id'),
+                    'new_role_id' => $request->role_id,
+                ]);
+            }
+        }
+
         $user->update($data);
 
         return redirect()->route('admin.users.index')

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class Employee extends Model
 {
@@ -52,9 +53,16 @@ class Employee extends Model
     /**
      * Get the department through the division.
      */
-    public function department()
+    public function department(): HasOneThrough
     {
-        return $this->division?->department;
+        return $this->hasOneThrough(
+            Department::class,
+            Division::class,
+            'id',           // Foreign key on divisions table
+            'id',           // Foreign key on departments table
+            'division_id',  // Local key on employees table
+            'department_id' // Local key on divisions table
+        );
     }
 
     /**

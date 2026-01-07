@@ -142,10 +142,10 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($employee->employeeLicenses as $employeeLicense)
+                    @foreach($employee->userLicenses as $employeeLicense)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <a href="{{ route('admin.employee-licenses.show', $employeeLicense) }}"
+                                <a href="{{ route('admin.user-licenses.show', $employeeLicense) }}"
                                     class="text-indigo-600 hover:text-indigo-900">
                                     {{ $employeeLicense->license->license_name }}
                                 </a>
@@ -159,7 +159,7 @@
                                 <x-status-badge :status="$employeeLicense->status->value" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('admin.employee-licenses.show', $employeeLicense) }}"
+                                <a href="{{ route('admin.user-licenses.show', $employeeLicense) }}"
                                     class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200" title="View">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">

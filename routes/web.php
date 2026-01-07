@@ -105,6 +105,9 @@ Route::prefix('admin')
             Route::resource('vendors', VendorController::class);
 
             // Licenses
+            Route::get('licenses/pending', [LicenseController::class, 'pending'])->name('licenses.pending');
+            Route::patch('licenses/{license}/approve', [LicenseController::class, 'approve'])->name('licenses.approve');
+            Route::patch('licenses/{license}/reject', [LicenseController::class, 'reject'])->name('licenses.reject');
             Route::resource('licenses', LicenseController::class);
             Route::resource('user-licenses', UserLicenseController::class);
 

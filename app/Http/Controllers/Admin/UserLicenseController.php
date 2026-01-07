@@ -15,7 +15,7 @@ class UserLicenseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = UserLicense::with(['employee.department', 'license.vendor']);
+        $query = UserLicense::with(['employee.division.department', 'license.vendor']);
 
         // Filter by employee
         if ($request->filled('employee_id')) {
@@ -28,7 +28,7 @@ class UserLicenseController extends Controller
         }
 
         $userLicenses = $query->latest()->paginate(15);
-        $employees = Employee::where('status', 'active')->orderBy('name')->get();
+        $employees = Employee::where('status', 'active')->orderBy('first_name')->get();
 
         return view('admin.user-licenses.index', compact('userLicenses', 'employees'));
     }
@@ -38,7 +38,7 @@ class UserLicenseController extends Controller
      */
     public function create(Request $request)
     {
-        $employees = Employee::where('status', 'active')->orderBy('name')->get();
+        $employees = Employee::where('status', 'active')->orderBy('first_name')->get();
         $licenses = License::with('vendor')->get();
 
         $selectedLicenseId = $request->get('license_id');
@@ -72,7 +72,7 @@ class UserLicenseController extends Controller
      */
     public function show(UserLicense $userLicense)
     {
-        $userLicense->load(['employee.department', 'license.vendor']);
+        $userLicense->load(['employee.division.department', 'license.vendor']);
 
         return view('admin.user-licenses.show', compact('userLicense'));
     }
@@ -82,7 +82,7 @@ class UserLicenseController extends Controller
      */
     public function edit(UserLicense $userLicense)
     {
-        $employees = Employee::where('status', 'active')->orderBy('name')->get();
+        $employees = Employee::where('status', 'active')->orderBy('first_name')->get();
         $licenses = License::with('vendor')->get();
 
         return view('admin.user-licenses.edit', compact('userLicense', 'employees', 'licenses'));

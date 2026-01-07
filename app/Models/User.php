@@ -27,6 +27,7 @@ class User extends Authenticatable
         'email',
         'status',
         'password',
+        'can_create_license',
     ];
 
     /**
@@ -50,6 +51,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'status' => UserStatus::class,
+            'can_create_license' => 'boolean',
         ];
     }
 
@@ -124,6 +126,32 @@ class User extends Authenticatable
     public function managedDivisions(): HasMany
     {
         return $this->hasMany(Division::class, 'gm_id');
+    }
+
+    /**
+     * Get licenses created by this user.
+     */
+    public function createdLicenses(): HasMany
+    {
+        return $this->hasMany(License::class, 'created_by');
+    }
+
+    /**
+     * Get licenses approved/rejected by this user.
+     */
+    public function approvedLicenses(): HasMany
+    {
+        return $this->hasMany(License::class, 'approved_by');
+    }
+
+    /**
+     * Get pending licenses count for this manager.
+     */
+    public function getPendingLicensesCount(): int
+    {
+        return License::where('created_by', $this->id)
+            ->where('status', 'pending')
+            ->count();
     }
 }
 

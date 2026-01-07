@@ -26,7 +26,7 @@
                     <dt class="text-sm font-medium text-gray-500">Employee</dt>
                     <dd class="mt-1 text-sm text-gray-900">
                         <a href="{{ route('admin.employees.show', $userLicense->employee) }}" class="text-indigo-600 hover:text-indigo-900">
-                            {{ $userLicense->employee->name }}
+                            {{ $userLicense->employee->first_name }} {{ $userLicense->employee->last_name }}
                         </a>
                     </dd>
                 </div>

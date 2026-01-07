@@ -131,7 +131,7 @@
                 @enderror
             </div>
 
-            <div>
+            <!-- <div>
                 <label for="head" class="block text-sm font-medium text-gray-700">Head <span class="text-red-500">*</span></label>
                 <div class="mt-1">
                     <select id="head" name="head" required
@@ -143,7 +143,7 @@
                 @error('head')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-            </div>
+            </div> -->
 
             <div class="flex justify-end space-x-3">
                 <a href="{{ route('admin.users.index') }}"

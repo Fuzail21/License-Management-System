@@ -63,6 +63,24 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
+        @elseif($icon === 'map-pin')
+        <svg class="{{ ($active ?? false) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }} mr-3 flex-shrink-0 h-6 w-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24"  
+            fill="currentColor" viewBox="0 0 24 24" >
+            <!--Boxicons v3.0.6 https://boxicons.com | License  https://docs.boxicons.com/free-->
+            <path d="M16 10c0-2.21-1.79-4-4-4s-4 1.79-4 4 1.79 4 4 4 4-1.79 4-4m-6 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2"></path><path d="M11.42 21.81c.17.12.38.19.58.19s.41-.06.58-.19c.3-.22 7.45-5.37 7.42-11.82 0-4.41-3.59-8-8-8s-8 3.59-8 8c-.03 6.44 7.12 11.6 7.42 11.82M12 4c3.31 0 6 2.69 6 6 .02 4.44-4.39 8.43-6 9.74-1.61-1.31-6.02-5.29-6-9.74 0-3.31 2.69-6 6-6"></path>
+        </svg>
+        @elseif($icon === 'building-office-2')
+        <svg class="{{ ($active ?? false) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }} mr-3 flex-shrink-0 h-6 w-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24"  
+            fill="currentColor" viewBox="0 0 24 24" >
+            <!--Boxicons v3.0.6 https://boxicons.com | License  https://docs.boxicons.com/free-->
+            <path d="m20,6h-4v-2c0-1.1-.9-2-2-2H4c-1.1,0-2,.9-2,2v17c0,.55.45,1,1,1h18c.55,0,1-.45,1-1v-13c0-1.1-.9-2-2-2Zm0,14H4V4h10v3c0,.55.45,1,1,1h5v12Z"></path><path d="M10 6H12V8H10z"></path><path d="M6 6H8V8H6z"></path><path d="M6 10H8V12H6z"></path><path d="M10 10H12V12H10z"></path><path d="M16 10H18V12H16z"></path><path d="M10 14H12V16H10z"></path><path d="M6 14H8V16H6z"></path><path d="M16 14H18V16H16z"></path>
+        </svg>
+        @elseif($icon === 'roles')
+        <svg class="{{ ($active ?? false) ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }} mr-3 flex-shrink-0 h-6 w-6" xmlns="http://www.w3.org/2000/svg" width="24" height="24"  
+            fill="currentColor" viewBox="0 0 24 24" >
+            <!--Boxicons v3.0.6 https://boxicons.com | License  https://docs.boxicons.com/free-->
+            <path d="M13 9h5v2h-5zM14 13h4v2h-4z"></path><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2M4 18V6h16v12z"></path><path d="M9 8a2 2 0 1 0 0 4 2 2 0 1 0 0-4M9 13c-1.66 0-3 1.34-3 3h6c0-1.66-1.34-3-3-3"></path>
+        </svg>
         @endif
     @endif
     {{ $slot }}

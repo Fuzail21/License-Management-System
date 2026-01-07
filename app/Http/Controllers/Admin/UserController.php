@@ -99,8 +99,7 @@ class UserController extends Controller
         // } else {
         //     $data['password'] = Hash::make($data['password']);
         // }
-        $data['password'] = '$2y$12$XIjmF0nelV7wXAOcBnVb7OGj03nUYttOie9sJj3A3UydTY/Bv2eG6';
-        $user->head = $request->has('head') ? 1 : 0;
+        // $data['password'] = '$2y$12$XIjmF0nelV7wXAOcBnVb7OGj03nUYttOie9sJj3A3UydTY/Bv2eG6';
         $user->update($data);
 
         return redirect()->route('admin.users.index')

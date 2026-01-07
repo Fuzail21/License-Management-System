@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCityScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Department extends Model
 {
-    use HasFactory;
+    use HasFactory, HasCityScope;
 
     /**
      * The attributes that are mass assignable.
@@ -17,9 +18,8 @@ class Department extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'division_id',
+        'city_id',
         'name',
-        'description',
         'status',
     ];
 
@@ -36,27 +36,67 @@ class Department extends Model
     }
 
     /**
-     * Get the users for the department.
+     * Get the city that the department belongs to.
      */
-    public function users(): HasMany
+    public function city(): BelongsTo
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(City::class);
     }
 
     /**
-     * Get the employees for the department.
+     * Get the divisions for the department.
      */
-    public function employees(): HasMany
+    public function divisions(): HasMany
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(Division::class);
     }
 
     /**
-     * Get the division that the department belongs to.
+     * Get the employees for the department (through divisions).
      */
-    public function division(): BelongsTo
+    public function employees()
     {
-        return $this->belongsTo(Division::class);
+        return $this->hasManyThrough(Employee::class, Division::class);
+    }
+
+    /**
+     * Scope a query to only include active departments.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope a query to only include inactive departments.
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('status', 'inactive');
+    }
+
+    /**
+     * Scope a query to filter by status.
+     */
+    public function scopeByStatus($query, string $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    /**
+     * Check if department is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === DepartmentStatus::Active;
+    }
+
+    /**
+     * Check if department is inactive.
+     */
+    public function isInactive(): bool
+    {
+        return $this->status === DepartmentStatus::Inactive;
     }
 }
 

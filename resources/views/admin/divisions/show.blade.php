@@ -4,111 +4,123 @@
 @section('page-title', 'Division Details')
 
 @section('content')
-    <div class="max-w-4xl mx-auto space-y-6">
-        {{-- Division Information Card --}}
+    <div class="space-y-6">
+        {{-- Division Information --}}
         <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Division Information</h3>
-                <div class="flex gap-2">
+                @can('update', $division)
                     <a href="{{ route('admin.divisions.edit', $division) }}"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
+                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                        <svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        Edit Division
+                        Edit
                     </a>
-                    <a href="{{ route('admin.divisions.index') }}"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Back to List
-                    </a>
-                </div>
+                @endcan
             </div>
-            <div class="px-5 py-4 space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div class="px-6 py-4">
+                <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Division Name</label>
-                        <p class="mt-1 text-sm text-gray-900 font-semibold">{{ $division->name }}</p>
+                        <dt class="text-sm font-medium text-gray-500">Division Name</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $division->name }}</dd>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">General Manager</label>
-                        <p class="mt-1 text-sm text-gray-900">
-                            {{ $division->gm ? $division->gm->name : 'Not Assigned' }}
-                            @if($division->gm)
-                                <span class="text-gray-500">({{ $division->gm->email }})</span>
+                        <dt class="text-sm font-medium text-gray-500">Department</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $division->department->name ?? 'N/A' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">City</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $division->department->city->name ?? 'N/A' }}</dd>
+                    </div>
+
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500">Status</dt>
+                        <dd class="mt-1">
+                            @if ($division->isActive())
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Active
+                                </span>
+                            @else
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Inactive
+                                </span>
                             @endif
-                        </p>
+                        </dd>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Total Departments</label>
-                        <p class="mt-1">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                {{ $division->departments_count }} {{ Str::plural('department', $division->departments_count) }}
-                            </span>
-                        </p>
+                        <dt class="text-sm font-medium text-gray-500">Created At</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $division->created_at->format('M d, Y H:i') }}</dd>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500">Created At</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ $division->created_at->format('M d, Y h:i A') }}</p>
-                    </div>
+                </dl>
+            </div>
+        </div>
+
+        {{-- Statistics --}}
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                 </div>
-                @if($division->description)
-                    <div>
-                        <label class="block text-sm font-medium text-gray-500">Description</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ $division->description }}</p>
-                    </div>
-                @endif
-                <div>
-                    <label class="block text-sm font-medium text-gray-500">Last Updated</label>
-                    <p class="mt-1 text-sm text-gray-900">{{ $division->updated_at->format('M d, Y h:i A') }}</p>
+                <div class="ml-4">
+                    <dt class="text-sm font-medium text-gray-500">Employees</dt>
+                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $division->employees->count() }}</dd>
                 </div>
             </div>
         </div>
 
-        {{-- Departments in this Division --}}
-        <div class="bg-white shadow rounded-lg overflow-hidden">
-            <div class="px-5 py-4 border-b border-gray-200">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Departments in this Division</h3>
-            </div>
-            @if($division->departments->count() > 0)
+        {{-- Employees in this Division --}}
+        @if ($division->employees->isNotEmpty())
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Employees (Top 10)</h3>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($division->departments as $department)
+                            @foreach ($division->employees->take(10) as $employee)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $department->name }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $department->description ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <x-status-badge :status="$department->status->value" />
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        {{ $employee->first_name }} {{ $employee->last_name }}
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $employee->email ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-sm">
+                                        @if ($employee->status === \App\Models\EmployeeStatus::Active)
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                        @else
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                                Inactive
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                @if($division->departments_count > 10)
-                    <div class="px-5 py-4 border-t border-gray-200 text-center">
-                        <p class="text-sm text-gray-500">Showing first 10 departments. Total: {{ $division->departments_count }} departments</p>
-                    </div>
-                @endif
-            @else
-                <div class="px-6 py-10 text-center">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No departments assigned</h3>
-                    <p class="mt-1 text-sm text-gray-500">No departments are currently assigned to this division.</p>
-                </div>
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
 @endsection

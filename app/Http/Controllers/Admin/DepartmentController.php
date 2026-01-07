@@ -3,35 +3,54 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreDepartmentRequest;
-use App\Http\Requests\Admin\UpdateDepartmentRequest;
+use App\Http\Requests\StoreDepartmentRequest;
+use App\Http\Requests\UpdateDepartmentRequest;
+use App\Models\City;
 use App\Models\Department;
-use App\Models\Division;
+use App\Services\AuditLogService;
+use App\Services\DepartmentService;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
+    protected $departmentService;
+
+    public function __construct(DepartmentService $departmentService)
+    {
+        $this->departmentService = $departmentService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Department::query();
+        // Apply city scoping for managers
+        $query = Department::with(['city', 'divisions'])
+            ->forManager()
+            ->withCount('divisions');
 
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status);
+        // Filter by city
+        if ($request->filled('city_id')) {
+            $query->where('departments.city_id', $request->city_id);
         }
 
-        if ($request->has('search') && $request->search !== '') {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('description', 'like', '%' . $request->search . '%');
-            });
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('departments.status', $request->status);
         }
 
-        $departments = $query->with('division')->withCount('employees')->orderBy('created_at', 'desc')->paginate(15);
+        // Search
+        if ($request->filled('search')) {
+            $query->where('departments.name', 'like', '%' . $request->search . '%');
+        }
 
-        return view('admin.departments.index', compact('departments'));
+        $departments = $query->orderBy('departments.created_at', 'desc')->paginate(15)->withQueryString();
+
+        // Get cities for filter dropdown (scoped for managers)
+        $cities = City::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.departments.index', compact('departments', 'cities'));
     }
 
     /**
@@ -39,8 +58,12 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $divisions = Division::orderBy('name')->get();
-        return view('admin.departments.create', compact('divisions'));
+        $this->authorize('create', Department::class);
+
+        // Get cities that the user can access
+        $cities = City::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.departments.create', compact('cities'));
     }
 
     /**
@@ -48,7 +71,7 @@ class DepartmentController extends Controller
      */
     public function store(StoreDepartmentRequest $request)
     {
-        Department::create($request->validated());
+        $department = Department::create($request->validated());
 
         return redirect()->route('admin.departments.index')
             ->with('success', 'Department created successfully.');
@@ -59,17 +82,31 @@ class DepartmentController extends Controller
      */
     public function show(Department $department)
     {
-        $department->load('employees');
-        return view('admin.departments.show', compact('department'));
+        $this->authorize('view', $department);
+
+        $department->load([
+            'city',
+            'divisions.employees' => fn ($q) =>
+                $q->where('employees.status', 'active')
+        ]);
+
+        $stats = $this->departmentService->getStatistics($department);
+
+        return view('admin.departments.show', compact('department', 'stats'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Department $department)
     {
-        $divisions = Division::orderBy('name')->get();
-        return view('admin.departments.edit', compact('department', 'divisions'));
+        $this->authorize('update', $department);
+
+        // Get cities that the user can access
+        $cities = City::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.departments.edit', compact('department', 'cities'));
     }
 
     /**
@@ -88,10 +125,33 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
-        $department->delete();
+        $this->authorize('delete', $department);
 
-        return redirect()->route('admin.departments.index')
-            ->with('success', 'Department deleted successfully.');
+        $canDelete = $this->departmentService->canDelete($department);
+
+        if (!$canDelete['can_delete']) {
+            // Log the attempt to delete department with children
+            AuditLogService::logUnauthorizedAccess(
+                'department_delete_with_children',
+                auth()->id(),
+                [
+                    'department_id' => $department->id,
+                    'department_name' => $department->name,
+                    'divisions_count' => $canDelete['divisions_count'],
+                ]
+            );
+
+            return back()->with('error', $canDelete['message']);
+        }
+
+        $result = $this->departmentService->delete($department);
+
+        if ($result['success']) {
+            return redirect()->route('admin.departments.index')
+                ->with('success', $result['message']);
+        }
+
+        return back()->with('error', $result['message']);
     }
 
     /**
@@ -99,10 +159,33 @@ class DepartmentController extends Controller
      */
     public function toggleStatus(Department $department)
     {
-        $department->status = $department->status === 'active' ? 'inactive' : 'active';
+        $this->authorize('update', $department);
+
+        $oldStatus = $department->status->value;
+        $newStatus = $department->isActive() ? 'inactive' : 'active';
+
+        $department->status = $newStatus;
         $department->save();
 
         return redirect()->back()
             ->with('success', 'Department status updated successfully.');
+    }
+
+    /**
+     * Force cascade delete (admin only).
+     */
+    public function forceDelete(Department $department)
+    {
+        $this->authorize('forceDelete', $department);
+
+        $result = $this->departmentService->forceCascadeDelete($department);
+
+        if ($result['success']) {
+            return redirect()->route('admin.departments.index')
+                ->with('success', $result['message'])
+                ->with('warning', 'Cascade delete removed ' . $result['deleted']['divisions'] . ' divisions and ' . $result['deleted']['employees'] . ' employees.');
+        }
+
+        return back()->with('error', $result['message']);
     }
 }

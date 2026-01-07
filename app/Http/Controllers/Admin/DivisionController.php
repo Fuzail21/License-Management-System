@@ -3,25 +3,54 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreDivisionRequest;
-use App\Http\Requests\Admin\UpdateDivisionRequest;
+use App\Http\Requests\StoreDivisionRequest;
+use App\Http\Requests\UpdateDivisionRequest;
+use App\Models\Department;
 use App\Models\Division;
-use App\Models\User;
+use App\Services\AuditLogService;
+use App\Services\DivisionService;
 use Illuminate\Http\Request;
 
 class DivisionController extends Controller
 {
+    protected $divisionService;
+
+    public function __construct(DivisionService $divisionService)
+    {
+        $this->divisionService = $divisionService;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $divisions = Division::with('gm')
-            ->withCount('departments')
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        // Apply city scoping for managers
+        $query = Division::with(['department.city', 'employees'])
+            ->forManager()
+            ->withCount('employees');
 
-        return view('admin.divisions.index', compact('divisions'));
+        // Filter by department
+        if ($request->filled('department_id')) {
+            $query->where('divisions.department_id', $request->department_id);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('divisions.status', $request->status);
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $query->where('divisions.name', 'like', '%' . $request->search . '%');
+        }
+
+        $divisions = $query->orderBy('divisions.created_at', 'desc')->paginate(15)->withQueryString();
+
+        // Get departments for filter dropdown (scoped for managers)
+        $departments = Department::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.divisions.index', compact('divisions', 'departments'));
     }
 
     /**
@@ -29,11 +58,12 @@ class DivisionController extends Controller
      */
     public function create()
     {
-        $users = User::where('status', 'active')
-            ->orderBy('name')
-            ->get();
+        $this->authorize('create', Division::class);
 
-        return view('admin.divisions.create', compact('users'));
+        // Get departments that the user can access
+        $departments = Department::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.divisions.create', compact('departments'));
     }
 
     /**
@@ -41,7 +71,7 @@ class DivisionController extends Controller
      */
     public function store(StoreDivisionRequest $request)
     {
-        Division::create($request->validated());
+        $division = Division::create($request->validated());
 
         return redirect()->route('admin.divisions.index')
             ->with('success', 'Division created successfully.');
@@ -52,12 +82,12 @@ class DivisionController extends Controller
      */
     public function show(Division $division)
     {
-        $division->loadCount('departments');
-        $division->load(['gm', 'departments' => function($query) {
-            $query->limit(10);
-        }]);
+        $this->authorize('view', $division);
 
-        return view('admin.divisions.show', compact('division'));
+        $division->load(['department.city', 'employees']);
+        $stats = $this->divisionService->getStatistics($division);
+
+        return view('admin.divisions.show', compact('division', 'stats'));
     }
 
     /**
@@ -65,11 +95,12 @@ class DivisionController extends Controller
      */
     public function edit(Division $division)
     {
-        $users = User::where('status', 'active')
-            ->orderBy('name')
-            ->get();
+        $this->authorize('update', $division);
 
-        return view('admin.divisions.edit', compact('division', 'users'));
+        // Get departments that the user can access
+        $departments = Department::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.divisions.edit', compact('division', 'departments'));
     }
 
     /**
@@ -88,16 +119,50 @@ class DivisionController extends Controller
      */
     public function destroy(Division $division)
     {
-        $departmentCount = $division->departments()->count();
+        $this->authorize('delete', $division);
 
-        if ($departmentCount > 0) {
-            return redirect()->route('admin.divisions.index')
-                ->with('error', "Cannot delete division. {$departmentCount} department(s) are assigned to this division.");
+        $canDelete = $this->divisionService->canDelete($division);
+
+        if (!$canDelete['can_delete']) {
+            // Log the attempt to delete division with children
+            AuditLogService::logUnauthorizedAccess(
+                'division_delete_with_children',
+                auth()->id(),
+                [
+                    'division_id' => $division->id,
+                    'division_name' => $division->name,
+                    'employees_count' => $canDelete['employees_count'],
+                ]
+            );
+
+            return back()->with('error', $canDelete['message']);
         }
 
-        $division->delete();
+        $result = $this->divisionService->delete($division);
 
-        return redirect()->route('admin.divisions.index')
-            ->with('success', 'Division deleted successfully.');
+        if ($result['success']) {
+            return redirect()->route('admin.divisions.index')
+                ->with('success', $result['message']);
+        }
+
+        return back()->with('error', $result['message']);
+    }
+
+    /**
+     * Force cascade delete (admin only).
+     */
+    public function forceDelete(Division $division)
+    {
+        $this->authorize('forceDelete', $division);
+
+        $result = $this->divisionService->forceCascadeDelete($division);
+
+        if ($result['success']) {
+            return redirect()->route('admin.divisions.index')
+                ->with('success', $result['message'])
+                ->with('warning', 'Cascade delete removed ' . $result['deleted']['employees'] . ' employees.');
+        }
+
+        return back()->with('error', $result['message']);
     }
 }

@@ -68,18 +68,40 @@
                 </x-nav-link>
 
                 <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Management
+                    Organization
                 </div>
 
-                <x-nav-link :href="route('admin.departments.index')" :active="request()->routeIs('admin.departments.*')"
-                    icon="building-office">
-                    Departments
-                </x-nav-link>
+                @can('viewAny', App\Models\City::class)
+                    <x-nav-link :href="route('admin.cities.index')" :active="request()->routeIs('admin.cities.*')"
+                        icon="map-pin">
+                        Cities
+                    </x-nav-link>
+                @endcan
 
-                <x-nav-link :href="route('admin.employees.index')" :active="request()->routeIs('admin.employees.*')"
-                    icon="users">
-                    Employees
-                </x-nav-link>
+                @can('viewAny', App\Models\Department::class)
+                    <x-nav-link :href="route('admin.departments.index')" :active="request()->routeIs('admin.departments.*')"
+                        icon="building-office">
+                        Departments
+                    </x-nav-link>
+                @endcan
+
+                @can('viewAny', App\Models\Division::class)
+                    <x-nav-link :href="route('admin.divisions.index')" :active="request()->routeIs('admin.divisions.*')"
+                        icon="building-office-2">
+                        Divisions
+                    </x-nav-link>
+                @endcan
+
+                @can('viewAny', App\Models\Employee::class)
+                    <x-nav-link :href="route('admin.employees.index')" :active="request()->routeIs('admin.employees.*')"
+                        icon="users">
+                        Employees
+                    </x-nav-link>
+                @endcan
+
+                <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    License Management
+                </div>
 
                 <x-nav-link :href="route('admin.vendors.index')" :active="request()->routeIs('admin.vendors.*')"
                     icon="building-storefront">
@@ -102,35 +124,21 @@
                 </x-nav-link>
 
                 @if(auth()->user()->role && auth()->user()->role->name === 'Admin')
-                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"
-                        icon="users">
-                        Users
-                    </x-nav-link>
-                @endif
-                {{-- <x-nav-link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')"
-                    icon="star">
-                    Reviews
-                </x-nav-link> --}}
-
-                <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                    Organization
-                </div>
-
-                <x-nav-link :href="route('admin.divisions.index')" :active="request()->routeIs('admin.divisions.*')"
-                    icon="building-office-2">
-                    Divisions
-                </x-nav-link>
-
-                <x-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')"
-                    icon="user-group">
-                    Roles
-                </x-nav-link>
-
-                @if(auth()->user()->role && auth()->user()->role->name === 'Admin')
 
                     <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         System
                     </div>
+                    
+                    <x-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')"
+                        icon="roles">
+                        Roles
+                    </x-nav-link>
+
+                
+                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')"
+                        icon="users">
+                        Users
+                    </x-nav-link>
 
                     <x-nav-link :href="route('admin.settings.index')" :active="request()->routeIs('admin.settings.*')"
                         icon="cog-6-tooth">
@@ -182,11 +190,28 @@
                             <div x-show="open" x-transition
                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 style="display: none;">
+                                <a href="{{ route('admin.profile.edit') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        Profile
+                                    </div>
+                                </a>
+                                <div class="border-t border-gray-100"></div>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
                                         class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Sign out
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                            </svg>
+                                            Sign out
+                                        </div>
                                     </button>
                                 </form>
                             </div>

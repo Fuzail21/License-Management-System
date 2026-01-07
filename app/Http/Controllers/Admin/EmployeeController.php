@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreEmployeeRequest;
-use App\Http\Requests\Admin\UpdateEmployeeRequest;
-use App\Models\Department;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
+use App\Models\Division;
 use App\Models\Employee;
+use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -16,28 +17,36 @@ class EmployeeController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Employee::with('department');
+        // Apply city scoping for managers
+        $query = Employee::with(['division.department.city'])
+            ->forManager();
 
-        if ($request->has('department_id') && $request->department_id !== '') {
-            $query->where('department_id', $request->department_id);
+        // Filter by division
+        if ($request->filled('division_id')) {
+            $query->where('employees.division_id', $request->division_id);
         }
 
-        if ($request->has('status') && $request->status !== '') {
-            $query->where('status', $request->status);
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('employees.status', $request->status);
         }
 
-        if ($request->has('search') && $request->search !== '') {
+        // Search
+        if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%')
-                  ->orWhere('designation', 'like', '%' . $request->search . '%');
+                $q->where('employees.first_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('employees.last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('employees.email', 'like', '%' . $request->search . '%')
+                  ->orWhere('employees.employee_number', 'like', '%' . $request->search . '%');
             });
         }
 
-        $employees = $query->orderBy('created_at', 'desc')->paginate(15);
-        $departments = Department::where('status', 'active')->get();
+        $employees = $query->orderBy('employees.created_at', 'desc')->paginate(15)->withQueryString();
 
-        return view('admin.employees.index', compact('employees', 'departments'));
+        // Get divisions for filter dropdown (scoped for managers)
+        $divisions = Division::forManager()->active()->orderBy('name')->get();
+
+        return view('admin.employees.index', compact('employees', 'divisions'));
     }
 
     /**
@@ -45,8 +54,16 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        $departments = Department::where('status', 'active')->get();
-        return view('admin.employees.create', compact('departments'));
+        $this->authorize('create', Employee::class);
+
+        // Get divisions that the user can access
+        $divisions = Division::with('department.city')
+            ->forManager()
+            ->active()
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.employees.create', compact('divisions'));
     }
 
     /**
@@ -54,10 +71,7 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
-        $data = $request->validated();
-        $data['head'] = $request->has('head') ? 1 : 0;
-
-        Employee::create($data);
+        $employee = Employee::create($request->validated());
 
         return redirect()->route('admin.employees.index')
             ->with('success', 'Employee created successfully.');
@@ -68,7 +82,10 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        $employee->load(['department', 'userLicenses.license.vendor']);
+        $this->authorize('view', $employee);
+
+        $employee->load(['division.department.city', 'userLicenses.license.vendor']);
+
         return view('admin.employees.show', compact('employee'));
     }
 
@@ -77,8 +94,16 @@ class EmployeeController extends Controller
      */
     public function edit(Employee $employee)
     {
-        $departments = Department::where('status', 'active')->get();
-        return view('admin.employees.edit', compact('employee', 'departments'));
+        $this->authorize('update', $employee);
+
+        // Get divisions that the user can access
+        $divisions = Division::with('department.city')
+            ->forManager()
+            ->active()
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.employees.edit', compact('employee', 'divisions'));
     }
 
     /**
@@ -86,10 +111,7 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        $data = $request->validated();
-        $data['head'] = $request->has('head') ? 1 : 0;
-
-        $employee->update($data);
+        $employee->update($request->validated());
 
         return redirect()->route('admin.employees.index')
             ->with('success', 'Employee updated successfully.');
@@ -100,9 +122,143 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
+        $this->authorize('delete', $employee);
+
         $employee->delete();
 
         return redirect()->route('admin.employees.index')
             ->with('success', 'Employee deleted successfully.');
+    }
+
+    /**
+     * Bulk delete employees.
+     */
+    public function bulkDelete(Request $request)
+    {
+        $this->authorize('bulkDelete', Employee::class);
+
+        $validated = $request->validate([
+            'employee_ids' => 'required|array',
+            'employee_ids.*' => 'exists:employees,id',
+        ]);
+
+        $employeeIds = $validated['employee_ids'];
+
+        // Verify all employees are accessible to the user
+        $employees = Employee::forManager()
+            ->whereIn('id', $employeeIds)
+            ->get();
+
+        if ($employees->count() !== count($employeeIds)) {
+            AuditLogService::logUnauthorizedAccess(
+                'employee_bulk_delete_unauthorized',
+                auth()->id(),
+                [
+                    'requested_ids' => $employeeIds,
+                    'accessible_count' => $employees->count(),
+                ]
+            );
+
+            return back()->with('error', 'Some employees are not accessible to you.');
+        }
+
+        Employee::whereIn('id', $employeeIds)->delete();
+
+        AuditLogService::logBulkOperation(
+            'bulk_delete',
+            'employee',
+            $employeeIds,
+            auth()->id()
+        );
+
+        $count = count($employeeIds);
+        return back()->with('success', "{$count} employees deleted successfully.");
+    }
+
+    /**
+     * Export employees data.
+     */
+    public function export(Request $request)
+    {
+        $this->authorize('export', Employee::class);
+
+        $filters = $request->only(['division_id', 'status', 'date_from', 'date_to']);
+
+        // Apply city scoping for managers
+        $query = Employee::with(['division.department.city'])
+            ->forManager();
+
+        // Apply filters
+        if (!empty($filters['division_id'])) {
+            $query->where('division_id', $filters['division_id']);
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $query->where('hire_date', '>=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $query->where('hire_date', '<=', $filters['date_to']);
+        }
+
+        $employees = $query->get();
+
+        // Log the export
+        AuditLogService::logDataExport(
+            'employees',
+            $filters,
+            auth()->id()
+        );
+
+        // Generate CSV
+        $filename = 'employees_' . now()->format('Y-m-d_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function() use ($employees) {
+            $file = fopen('php://output', 'w');
+
+            // CSV headers
+            fputcsv($file, [
+                'Employee Number',
+                'First Name',
+                'Last Name',
+                'Email',
+                'Phone',
+                'Job Title',
+                'Hire Date',
+                'Status',
+                'Division',
+                'Department',
+                'City',
+            ]);
+
+            // CSV rows
+            foreach ($employees as $employee) {
+                fputcsv($file, [
+                    $employee->employee_number,
+                    $employee->first_name,
+                    $employee->last_name,
+                    $employee->email,
+                    $employee->phone,
+                    $employee->job_title,
+                    $employee->hire_date,
+                    $employee->status,
+                    $employee->division->name ?? 'N/A',
+                    $employee->division->department->name ?? 'N/A',
+                    $employee->division->department->city->name ?? 'N/A',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

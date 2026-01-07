@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasCityScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Model
 {
-    use HasFactory;
+    use HasFactory, HasCityScope;
 
     /**
      * The attributes that are mass assignable.
@@ -17,13 +18,14 @@ class Employee extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'department_id',
-        'name',
+        'division_id',
+        'employee_number',
+        'first_name',
+        'last_name',
         'email',
         'phone',
-        'designation',
+        'hire_date',
         'status',
-        'head',
     ];
 
     /**
@@ -35,16 +37,40 @@ class Employee extends Model
     {
         return [
             'status' => EmployeeStatus::class,
-            'head' => 'boolean',
+            'hire_date' => 'date',
         ];
     }
 
     /**
-     * Get the department that the employee belongs to.
+     * Get the division that the employee belongs to.
      */
-    public function department(): BelongsTo
+    public function division(): BelongsTo
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Division::class);
+    }
+
+    /**
+     * Get the department through the division.
+     */
+    public function department()
+    {
+        return $this->division?->department;
+    }
+
+    /**
+     * Get the employee's full name.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Scope a query to only include active employees.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
     }
 
     /**
@@ -76,4 +102,6 @@ enum EmployeeStatus: string
 {
     case Active = 'active';
     case Inactive = 'inactive';
+    case Terminated = 'terminated';
+    case OnLeave = 'on_leave';
 }

@@ -15,14 +15,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed roles first
-        $this->call(RoleSeeder::class);
+        // Seed in correct order to respect foreign key constraints
+        $this->call([
+            // 1. Roles (no dependencies)
+            RoleSeeder::class,
 
-        // User::factory(10)->create();
+            // 2. Cities (no dependencies)
+            CitySeeder::class,
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            // 3. Users (depends on roles)
+            UserSeeder::class,
+
+            // 4. City-Manager assignments (depends on cities and users)
+            CityManagerSeeder::class,
+
+            // 5. Departments (depends on cities)
+            DepartmentSeeder::class,
+
+            // 6. Divisions (depends on departments)
+            DivisionSeeder::class,
+
+            // 7. Employees (depends on divisions)
+            EmployeeSeeder::class,
         ]);
     }
 }

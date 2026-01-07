@@ -4,78 +4,79 @@
 @section('page-title', 'Create Department')
 
 @section('content')
-    <div class="bg-white shadow rounded-lg overflow-hidden max-w-2xl mx-auto">
-        <div class="px-5 py-4 border-b border-gray-200">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Department Details</h3>
-        </div>
-        <form action="{{ route('admin.departments.store') }}" method="POST" class="p-6 space-y-6">
-            @csrf
-
-            <div>
-                <label for="name" class="block text-sm font-medium text-gray-700">Department Name</label>
-                <div class="mt-1">
-                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                </div>
-                @error('name')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Create New Department</h3>
+                <p class="mt-1 text-sm text-gray-500">Add a new department to a city.</p>
             </div>
 
-            <div>
-                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
-                <div class="mt-1">
-                    <textarea id="description" name="description" rows="3"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">{{ old('description') }}</textarea>
-                </div>
-                @error('description')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            <form action="{{ route('admin.departments.store') }}" method="POST">
+                @csrf
 
-            <div>
-                <label for="division_id" class="block text-sm font-medium text-gray-700">Division</label>
-                <div class="mt-1">
-                    <select id="division_id" name="division_id"
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                        <option value="">-- Select Division (Optional) --</option>
-                        @foreach($divisions as $division)
-                            <option value="{{ $division->id }}" {{ old('division_id') == $division->id ? 'selected' : '' }}>
-                                {{ $division->name }}
+                <div class="px-6 py-4 space-y-6">
+                    {{-- City Selection --}}
+                    <div>
+                        <label for="city_id" class="block text-sm font-medium text-gray-700">
+                            City <span class="text-red-500">*</span>
+                        </label>
+                        <select name="city_id" id="city_id" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('city_id') border-red-300 @enderror">
+                            <option value="">-- Select City --</option>
+                            @foreach ($cities as $city)
+                                <option value="{{ $city->id }}" {{ old('city_id') == $city->id ? 'selected' : '' }}>
+                                    {{ $city->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('city_id')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Department Name --}}
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">
+                            Department Name <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('name') border-red-300 @enderror">
+                        @error('name')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Status --}}
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">
+                            Status <span class="text-red-500">*</span>
+                        </label>
+                        <select name="status" id="status" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('status') border-red-300 @enderror">
+                            <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active
                             </option>
-                        @endforeach
-                    </select>
+                            <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        </select>
+                        @error('status')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
-                @error('division_id')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-                <p class="mt-1 text-sm text-gray-500">Assign this department to a division.</p>
-            </div>
 
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                <div class="mt-1">
-                    <select id="status" name="status" required
-                        class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
-                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                    </select>
+                <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+                    <a href="{{ route('admin.departments.index') }}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Create Department
+                    </button>
                 </div>
-                @error('status')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div class="flex justify-end space-x-3">
-                <a href="{{ route('admin.departments.index') }}"
-                    class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Cancel
-                </a>
-                <button type="submit"
-                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Create Department
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 @endsection

@@ -14,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'guest' => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
-            'admin' => \App\Http\Middleware\CheckAdminRole::class,
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'manager' => \App\Http\Middleware\EnsureUserIsManager::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
 
         $middleware->redirectGuestsTo('/login');

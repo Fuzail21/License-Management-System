@@ -39,7 +39,7 @@ class UserLicenseController extends Controller
     public function create(Request $request)
     {
         $employees = Employee::where('status', 'active')->orderBy('first_name')->get();
-        $licenses = License::with('vendor')->get();
+        $licenses = License::with('vendor')->where('status', 'approved')->get();
 
         $selectedLicenseId = $request->get('license_id');
 

@@ -177,6 +177,9 @@ Route::prefix('admin')
                 'cities/{city}/managers/{manager}',
                 [CityController::class, 'removeManager']
             )->name('cities.remove-manager');
+
+            Route::patch('/admin/licenses/{license}/reject', [LicenseController::class, 'reject'])
+                ->name('admin.licenses.reject');
         });
 
     // Route::get('reviews', [UserFeedbackController::class, 'index'])->name('reviews.index');

@@ -170,6 +170,9 @@
                     </button>
 
                     <div class="flex items-center gap-4 ml-auto">
+                        <!-- Notification Panel -->
+                        <x-notification-panel :licenses="$pendingLicenses ?? collect()" :count="$pendingLicenseCount ?? 0" />
+
                         <!-- User Dropdown -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" @click.outside="open = false"

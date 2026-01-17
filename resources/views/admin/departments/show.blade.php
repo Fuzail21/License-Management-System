@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Department Details')
-@section('page-title', 'Department: ' . $department->name)
+@section('page-title', 'Department Details')
 
 @section('content')
     <div class="space-y-6">
@@ -29,8 +29,13 @@
                     </div>
 
                     <div>
+                        <dt class="text-sm font-medium text-gray-500">Division</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $department->division->name ?? 'N/A' }}</dd>
+                    </div>
+
+                    <div>
                         <dt class="text-sm font-medium text-gray-500">City</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $department->city->name ?? 'N/A' }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $department->division->city->name ?? 'N/A' }}</dd>
                     </div>
 
                     <div>
@@ -57,43 +62,26 @@
         </div>
 
         {{-- Statistics --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white shadow rounded-lg p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <dt class="text-sm font-medium text-gray-500">Divisions</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['divisions_count'] }}</dd>
-                    </div>
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                    <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
                 </div>
-            </div>
-
-            <div class="bg-white shadow rounded-lg p-6">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-                        <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <dt class="text-sm font-medium text-gray-500">Employees</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['employees_count'] }}</dd>
-                    </div>
+                <div class="ml-4">
+                    <dt class="text-sm font-medium text-gray-500">Employees</dt>
+                    <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['employees_count'] ?? 0 }}</dd>
                 </div>
             </div>
         </div>
 
-        {{-- Divisions --}}
-        @if ($department->divisions->isNotEmpty())
+        {{-- Employees in this Department --}}
+        @if ($department->employees->isNotEmpty())
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Divisions (Top 10)</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Employees (Top 10)</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -102,28 +90,30 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Name</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Employees</th>
+                                    Email</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($department->divisions->take(10) as $division)
+                            @foreach ($department->employees->take(10) as $employee)
                                 <tr>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $division->name }}
+                                        <a href="{{ route('admin.employees.show', $employee) }}" class="text-indigo-600 hover:text-indigo-900">
+                                            {{ $employee->first_name }} {{ $employee->last_name }}
+                                        </a>
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $division->employees->count() }}
+                                        {{ $employee->email ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm">
-                                        @if ($division->isActive())
+                                        @if ($employee->status === \App\Models\EmployeeStatus::Active)
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 Active
                                             </span>
                                         @else
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                Inactive
+                                                {{ $employee->status->value ?? 'Inactive' }}
                                             </span>
                                         @endif
                                     </td>

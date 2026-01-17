@@ -82,8 +82,8 @@
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <dt class="text-sm font-medium text-gray-500">Departments</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['departments_count'] }}</dd>
+                        <dt class="text-sm font-medium text-gray-500">Divisions</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['divisions_count'] }}</dd>
                     </div>
                 </div>
             </div>
@@ -97,8 +97,8 @@
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <dt class="text-sm font-medium text-gray-500">Divisions</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['divisions_count'] }}</dd>
+                        <dt class="text-sm font-medium text-gray-500">Departments</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-gray-900">{{ $stats['departments_count'] }}</dd>
                     </div>
                 </div>
             </div>
@@ -151,11 +151,11 @@
             </div>
         </div>
 
-        {{-- Departments --}}
-        @if ($city->departments->isNotEmpty())
+        {{-- Divisions --}}
+        @if ($city->divisions->isNotEmpty())
             <div class="bg-white shadow rounded-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Departments (Top 10)</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Divisions (Top 10)</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -164,22 +164,22 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Name</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Divisions</th>
+                                    Departments</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Status</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($city->departments->take(10) as $department)
+                            @foreach ($city->divisions->take(10) as $division)
                                 <tr>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $department->name }}
+                                        {{ $division->name }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $department->divisions->count() }}
+                                        {{ $division->departments->count() }}
                                     </td>
                                     <td class="px-6 py-3 whitespace-nowrap text-sm">
-                                        @if ($department->isActive())
+                                        @if ($division->isActive())
                                             <span
                                                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                                 Active

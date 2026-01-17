@@ -15,12 +15,12 @@ class CityService
      */
     public function canDelete(City $city): array
     {
-        $departmentCount = $city->departments()->count();
+        $divisionCount = $city->divisions()->count();
         $managerCount = $city->managers()->count();
 
         $reasons = [];
-        if ($departmentCount > 0) {
-            $reasons[] = "{$departmentCount} department(s)";
+        if ($divisionCount > 0) {
+            $reasons[] = "{$divisionCount} division(s)";
         }
         if ($managerCount > 0) {
             $reasons[] = "{$managerCount} manager assignment(s)";
@@ -30,16 +30,16 @@ class CityService
             return [
                 'can_delete' => false,
                 'reason' => 'Cannot delete city with existing ' . implode(' and ', $reasons) . '.',
-                'departments_count' => $departmentCount,
+                'divisions_count' => $divisionCount,
                 'managers_count' => $managerCount,
-                'message' => "This city has {$departmentCount} department(s) and {$managerCount} manager assignment(s). Please delete or reassign all related data before deleting this city.",
+                'message' => "This city has {$divisionCount} division(s) and {$managerCount} manager assignment(s). Please delete or reassign all related data before deleting this city.",
             ];
         }
 
         return [
             'can_delete' => true,
             'reason' => null,
-            'departments_count' => 0,
+            'divisions_count' => 0,
             'managers_count' => 0,
             'message' => null,
         ];
@@ -85,21 +85,21 @@ class CityService
      */
     public function getStatistics(City $city): array
     {
-        $departments = $city->departments()->with('divisions.employees')->get();
+        $divisions = $city->divisions()->with('departments.employees')->get();
 
-        $divisionsCount = 0;
+        $departmentsCount = 0;
         $employeesCount = 0;
 
-        foreach ($departments as $department) {
-            $divisionsCount += $department->divisions->count();
-            foreach ($department->divisions as $division) {
-                $employeesCount += $division->employees->count();
+        foreach ($divisions as $division) {
+            $departmentsCount += $division->departments->count();
+            foreach ($division->departments as $department) {
+                $employeesCount += $department->employees->count();
             }
         }
 
         return [
-            'departments_count' => $departments->count(),
-            'divisions_count' => $divisionsCount,
+            'divisions_count' => $divisions->count(),
+            'departments_count' => $departmentsCount,
             'employees_count' => $employeesCount,
             'managers_count' => $city->managers()->count(),
         ];
@@ -126,20 +126,20 @@ class CityService
                 'statistics' => $stats,
             ]);
 
-            // Get all departments with divisions and employees
-            $departments = $city->departments()->with('divisions.employees')->get();
+            // Get all divisions with departments and employees
+            $divisions = $city->divisions()->with('departments.employees')->get();
 
-            // Delete all employees in all divisions in all departments
-            foreach ($departments as $department) {
-                foreach ($department->divisions as $division) {
-                    $division->employees()->delete();
+            // Delete all employees in all departments in all divisions
+            foreach ($divisions as $division) {
+                foreach ($division->departments as $department) {
+                    $department->employees()->delete();
                 }
-                // Delete all divisions
-                $department->divisions()->delete();
+                // Delete all departments
+                $division->departments()->delete();
             }
 
-            // Delete all departments
-            $city->departments()->delete();
+            // Delete all divisions
+            $city->divisions()->delete();
 
             // Delete all manager assignments
             $city->managers()->detach();
@@ -154,8 +154,8 @@ class CityService
                 'message' => 'City and all related data deleted successfully.',
                 'deleted' => [
                     'city' => 1,
-                    'departments' => $stats['departments_count'],
                     'divisions' => $stats['divisions_count'],
+                    'departments' => $stats['departments_count'],
                     'employees' => $stats['employees_count'],
                     'manager_assignments' => $stats['managers_count'],
                 ],

@@ -114,13 +114,12 @@
                 </div>
 
                 <div>
-                    <label for="number_license_assigned" class="block text-sm font-medium text-gray-700">Number of Licenses Assigned</label>
+                    <label for="renewal_date" class="block text-sm font-medium text-gray-700">Renewal Date</label>
                     <div class="mt-1">
-                        <input type="number" name="number_license_assigned" id="number_license_assigned"
-                            value="{{ old('number_license_assigned', $license->number_license_assigned) }}" min="0"
+                        <input type="date" name="renewal_date" id="renewal_date" value="{{ old('renewal_date', $license->renewal_date?->format('Y-m-d')) }}"
                             class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
                     </div>
-                    @error('number_license_assigned')
+                    @error('renewal_date')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

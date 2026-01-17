@@ -79,10 +79,30 @@
 
                 <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Number of Licenses Assigned</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ $license->number_license_assigned ?? 'N/A' }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">{{ $license->userLicenses()->count() }}</dd>
                 </div>
 
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Renewal Date</dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        @if($license->renewal_date)
+                            {{ $license->renewal_date->format('M d, Y') }}
+                            @if($license->renewal_date->isPast())
+                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                    Overdue
+                                </span>
+                            @elseif($license->renewal_date->diffInDays(now()) <= 30)
+                                <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    Due Soon
+                                </span>
+                            @endif
+                        @else
+                            N/A
+                        @endif
+                    </dd>
+                </div>
+
+                <div class="sm:col-span-1">
                     <dt class="text-sm font-medium text-gray-500">Description</dt>
                     <dd class="mt-1 text-sm text-gray-900">{{ $license->description ?? 'N/A' }}</dd>
                 </div>
@@ -102,7 +122,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">

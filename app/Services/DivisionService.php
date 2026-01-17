@@ -15,21 +15,21 @@ class DivisionService
      */
     public function canDelete(Division $division): array
     {
-        $employeeCount = $division->employees()->count();
+        $departmentCount = $division->departments()->count();
 
-        if ($employeeCount > 0) {
+        if ($departmentCount > 0) {
             return [
                 'can_delete' => false,
-                'reason' => 'Cannot delete division with existing employees.',
-                'employees_count' => $employeeCount,
-                'message' => "This division has {$employeeCount} employee(s). Please delete or reassign all employees before deleting this division.",
+                'reason' => 'Cannot delete division with existing departments.',
+                'departments_count' => $departmentCount,
+                'message' => "This division has {$departmentCount} department(s). Please delete or reassign all departments before deleting this division.",
             ];
         }
 
         return [
             'can_delete' => true,
             'reason' => null,
-            'employees_count' => 0,
+            'departments_count' => 0,
             'message' => null,
         ];
     }
@@ -75,11 +75,11 @@ class DivisionService
     public function getStatistics(Division $division): array
     {
         return [
+            'departments_count' => $division->departments()->count(),
+            'active_departments_count' => $division->departments()->where('departments.status', 'active')->count(),
+            'inactive_departments_count' => $division->departments()->where('departments.status', 'inactive')->count(),
             'employees_count' => $division->employees()->count(),
-            'active_employees_count' => $division->employees()->where('status', 'active')->count(),
-            'inactive_employees_count' => $division->employees()->where('status', 'inactive')->count(),
-            'on_leave_employees_count' => $division->employees()->where('status', 'on_leave')->count(),
-            'terminated_employees_count' => $division->employees()->where('status', 'terminated')->count(),
+            'active_employees_count' => $division->employees()->where('employees.status', 'active')->count(),
         ];
     }
 
@@ -100,13 +100,20 @@ class DivisionService
             \Log::info('Force cascade delete initiated for division', [
                 'division_id' => $division->id,
                 'division_name' => $division->name,
-                'department_id' => $division->department_id,
                 'user_id' => auth()->id(),
                 'statistics' => $stats,
             ]);
 
-            // Delete all employees
-            $division->employees()->delete();
+            // Get all departments for this division
+            $departments = $division->departments()->with('employees')->get();
+
+            // Delete all employees in all departments
+            foreach ($departments as $department) {
+                $department->employees()->delete();
+            }
+
+            // Delete all departments
+            $division->departments()->delete();
 
             // Delete the division
             $division->delete();
@@ -115,9 +122,10 @@ class DivisionService
 
             return [
                 'success' => true,
-                'message' => 'Division and all employees deleted successfully.',
+                'message' => 'Division and all related data deleted successfully.',
                 'deleted' => [
                     'division' => 1,
+                    'departments' => $stats['departments_count'],
                     'employees' => $stats['employees_count'],
                 ],
             ];

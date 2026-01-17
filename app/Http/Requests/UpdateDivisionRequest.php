@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Department;
+use App\Models\City;
 use App\Models\Division;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -20,14 +20,14 @@ class UpdateDivisionRequest extends FormRequest
             return false;
         }
 
-        // If manager is changing the department, verify they have access to the new department's city
-        if ($this->user()->isManager() && $this->has('department_id')) {
-            $newDepartmentId = $this->department_id;
-            $currentDepartmentId = $division->department_id;
+        // If manager is changing the city, verify they have access to the new city
+        if ($this->user()->isManager() && $this->has('city_id')) {
+            $newCityId = $this->city_id;
+            $currentCityId = $division->city_id;
 
-            // If department is changing, verify manager has access to new department
-            if ($newDepartmentId != $currentDepartmentId) {
-                return $this->user()->can('updateToDepartment', [Division::class, $division, $newDepartmentId]);
+            // If city is changing, verify manager has access to new city
+            if ($newCityId != $currentCityId) {
+                return $this->user()->can('updateToCity', [Division::class, $division, $newCityId]);
             }
         }
 
@@ -44,31 +44,30 @@ class UpdateDivisionRequest extends FormRequest
         $division = $this->route('division');
 
         return [
-            'department_id' => [
+            'city_id' => [
                 'required',
                 'integer',
-                Rule::exists('departments', 'id'),
+                Rule::exists('cities', 'id'),
                 function ($attribute, $value, $fail) use ($division) {
-                    $department = Department::with('city')->find($value);
+                    $city = City::find($value);
 
-                    if (!$department || !$department->city) {
-                        $fail('The selected department is invalid or incomplete.');
+                    if (!$city) {
+                        $fail('The selected city does not exist.');
                         return;
                     }
 
-                    // Managers can only update to departments they manage
+                    // Managers can only update to cities they manage
                     if ($this->user()->isManager()) {
                         $managedCityIds = $this->user()->managedCities()->pluck('cities.id')->toArray();
 
-                        // Verify manager has access to both current AND new department's city
-                        $currentDepartment = $division->department;
-                        if ($currentDepartment && !in_array($currentDepartment->city_id, $managedCityIds)) {
+                        // Verify manager has access to both current AND new city
+                        if (!in_array($division->city_id, $managedCityIds)) {
                             $fail('You do not have permission to update this division.');
                             return;
                         }
 
-                        if (!in_array($department->city_id, $managedCityIds)) {
-                            $fail('You do not have permission to move divisions to this department.');
+                        if (!in_array($value, $managedCityIds)) {
+                            $fail('You do not have permission to move divisions to this city.');
                         }
                     }
                 },
@@ -93,8 +92,8 @@ class UpdateDivisionRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'department_id.required' => 'Department is required.',
-            'department_id.exists' => 'The selected department does not exist.',
+            'city_id.required' => 'City is required.',
+            'city_id.exists' => 'The selected city does not exist.',
             'name.required' => 'Division name is required.',
             'name.min' => 'Division name must be at least 2 characters.',
             'name.max' => 'Division name cannot exceed 255 characters.',
@@ -108,10 +107,10 @@ class UpdateDivisionRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Sanitize department_id
-        if ($this->has('department_id')) {
+        // Sanitize city_id
+        if ($this->has('city_id')) {
             $this->merge([
-                'department_id' => filter_var($this->department_id, FILTER_VALIDATE_INT),
+                'city_id' => filter_var($this->city_id, FILTER_VALIDATE_INT),
             ]);
         }
 

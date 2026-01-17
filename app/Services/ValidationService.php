@@ -60,61 +60,12 @@ class ValidationService
     }
 
     /**
-     * Verify that a department exists, belongs to the correct city, and the user has access.
+     * Verify that a division exists, belongs to the correct city, and the user has access.
+     * New hierarchy: Division belongs directly to City.
      */
-    public static function validateDepartmentAccess(User $user, int $departmentId, ?int $expectedCityId = null): array
+    public static function validateDivisionAccess(User $user, int $divisionId, ?int $expectedCityId = null): array
     {
-        $department = Department::with('city')->find($departmentId);
-
-        if (!$department) {
-            return [
-                'valid' => false,
-                'error' => 'The selected department does not exist.',
-                'department' => null,
-            ];
-        }
-
-        if (!$department->city) {
-            return [
-                'valid' => false,
-                'error' => 'Department is not associated with a city.',
-                'department' => $department,
-            ];
-        }
-
-        // If expected city is provided, verify department belongs to it
-        if ($expectedCityId !== null && $department->city_id !== $expectedCityId) {
-            return [
-                'valid' => false,
-                'error' => 'Department does not belong to the specified city.',
-                'department' => $department,
-            ];
-        }
-
-        // Verify user has access to this department's city
-        $cityAccess = self::validateCityAccess($user, $department->city_id);
-
-        if (!$cityAccess['valid']) {
-            return [
-                'valid' => false,
-                'error' => 'You do not have permission to access this department.',
-                'department' => $department,
-            ];
-        }
-
-        return [
-            'valid' => true,
-            'error' => null,
-            'department' => $department,
-        ];
-    }
-
-    /**
-     * Verify that a division exists, belongs to the correct department, and the user has access.
-     */
-    public static function validateDivisionAccess(User $user, int $divisionId, ?int $expectedDepartmentId = null): array
-    {
-        $division = Division::with('department.city')->find($divisionId);
+        $division = Division::with('city')->find($divisionId);
 
         if (!$division) {
             return [
@@ -124,25 +75,25 @@ class ValidationService
             ];
         }
 
-        if (!$division->department || !$division->department->city) {
+        if (!$division->city) {
             return [
                 'valid' => false,
-                'error' => 'Division is not properly associated with a department and city.',
+                'error' => 'Division is not associated with a city.',
                 'division' => $division,
             ];
         }
 
-        // If expected department is provided, verify division belongs to it
-        if ($expectedDepartmentId !== null && $division->department_id !== $expectedDepartmentId) {
+        // If expected city is provided, verify division belongs to it
+        if ($expectedCityId !== null && $division->city_id !== $expectedCityId) {
             return [
                 'valid' => false,
-                'error' => 'Division does not belong to the specified department.',
+                'error' => 'Division does not belong to the specified city.',
                 'division' => $division,
             ];
         }
 
         // Verify user has access to this division's city
-        $cityAccess = self::validateCityAccess($user, $division->department->city_id);
+        $cityAccess = self::validateCityAccess($user, $division->city_id);
 
         if (!$cityAccess['valid']) {
             return [
@@ -160,11 +111,63 @@ class ValidationService
     }
 
     /**
-     * Verify that an employee exists, belongs to the correct division, and the user has access.
+     * Verify that a department exists, belongs to the correct division, and the user has access.
+     * New hierarchy: Department belongs to Division.
      */
-    public static function validateEmployeeAccess(User $user, int $employeeId, ?int $expectedDivisionId = null): array
+    public static function validateDepartmentAccess(User $user, int $departmentId, ?int $expectedDivisionId = null): array
     {
-        $employee = Employee::with('division.department.city')->find($employeeId);
+        $department = Department::with('division.city')->find($departmentId);
+
+        if (!$department) {
+            return [
+                'valid' => false,
+                'error' => 'The selected department does not exist.',
+                'department' => null,
+            ];
+        }
+
+        if (!$department->division || !$department->division->city) {
+            return [
+                'valid' => false,
+                'error' => 'Department is not properly associated with a division and city.',
+                'department' => $department,
+            ];
+        }
+
+        // If expected division is provided, verify department belongs to it
+        if ($expectedDivisionId !== null && $department->division_id !== $expectedDivisionId) {
+            return [
+                'valid' => false,
+                'error' => 'Department does not belong to the specified division.',
+                'department' => $department,
+            ];
+        }
+
+        // Verify user has access to this department's city
+        $cityAccess = self::validateCityAccess($user, $department->division->city_id);
+
+        if (!$cityAccess['valid']) {
+            return [
+                'valid' => false,
+                'error' => 'You do not have permission to access this department.',
+                'department' => $department,
+            ];
+        }
+
+        return [
+            'valid' => true,
+            'error' => null,
+            'department' => $department,
+        ];
+    }
+
+    /**
+     * Verify that an employee exists, belongs to the correct department, and the user has access.
+     * New hierarchy: Employee belongs to Department.
+     */
+    public static function validateEmployeeAccess(User $user, int $employeeId, ?int $expectedDepartmentId = null): array
+    {
+        $employee = Employee::with('department.division.city')->find($employeeId);
 
         if (!$employee) {
             return [
@@ -174,25 +177,25 @@ class ValidationService
             ];
         }
 
-        if (!$employee->division || !$employee->division->department || !$employee->division->department->city) {
+        if (!$employee->department || !$employee->department->division || !$employee->department->division->city) {
             return [
                 'valid' => false,
-                'error' => 'Employee is not properly associated with a division, department, and city.',
+                'error' => 'Employee is not properly associated with a department, division, and city.',
                 'employee' => $employee,
             ];
         }
 
-        // If expected division is provided, verify employee belongs to it
-        if ($expectedDivisionId !== null && $employee->division_id !== $expectedDivisionId) {
+        // If expected department is provided, verify employee belongs to it
+        if ($expectedDepartmentId !== null && $employee->department_id !== $expectedDepartmentId) {
             return [
                 'valid' => false,
-                'error' => 'Employee does not belong to the specified division.',
+                'error' => 'Employee does not belong to the specified department.',
                 'employee' => $employee,
             ];
         }
 
         // Verify user has access to this employee's city
-        $cityAccess = self::validateCityAccess($user, $employee->division->department->city_id);
+        $cityAccess = self::validateCityAccess($user, $employee->department->division->city_id);
 
         if (!$cityAccess['valid']) {
             return [
@@ -210,30 +213,30 @@ class ValidationService
     }
 
     /**
-     * Verify hierarchical integrity when creating/updating a department.
+     * Verify hierarchical integrity when creating/updating a division.
      * Ensures the city exists and user has access.
      */
-    public static function validateDepartmentHierarchy(User $user, int $cityId): array
+    public static function validateDivisionHierarchy(User $user, int $cityId): array
     {
         return self::validateCityAccess($user, $cityId);
     }
 
     /**
-     * Verify hierarchical integrity when creating/updating a division.
-     * Ensures department exists, belongs to accessible city.
+     * Verify hierarchical integrity when creating/updating a department.
+     * Ensures division exists, belongs to accessible city.
      */
-    public static function validateDivisionHierarchy(User $user, int $departmentId): array
+    public static function validateDepartmentHierarchy(User $user, int $divisionId): array
     {
-        return self::validateDepartmentAccess($user, $departmentId);
+        return self::validateDivisionAccess($user, $divisionId);
     }
 
     /**
      * Verify hierarchical integrity when creating/updating an employee.
-     * Ensures division exists, belongs to accessible department and city.
+     * Ensures department exists, belongs to accessible division and city.
      */
-    public static function validateEmployeeHierarchy(User $user, int $divisionId): array
+    public static function validateEmployeeHierarchy(User $user, int $departmentId): array
     {
-        return self::validateDivisionAccess($user, $divisionId);
+        return self::validateDepartmentAccess($user, $departmentId);
     }
 
     /**

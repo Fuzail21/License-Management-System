@@ -16,21 +16,21 @@
                 @method('PUT')
 
                 <div class="px-6 py-4 space-y-6">
-                    {{-- City Selection --}}
+                    {{-- Division Selection --}}
                     <div>
-                        <label for="city_id" class="block text-sm font-medium text-gray-700">
-                            City <span class="text-red-500">*</span>
+                        <label for="division_id" class="block text-sm font-medium text-gray-700">
+                            Division <span class="text-red-500">*</span>
                         </label>
-                        <select name="city_id" id="city_id" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('city_id') border-red-300 @enderror">
-                            <option value="">-- Select City --</option>
-                            @foreach ($cities as $city)
-                                <option value="{{ $city->id }}" {{ old('city_id', $department->city_id) == $city->id ? 'selected' : '' }}>
-                                    {{ $city->name }}
+                        <select name="division_id" id="division_id" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('division_id') border-red-300 @enderror">
+                            <option value="">-- Select Division --</option>
+                            @foreach ($divisions as $division)
+                                <option value="{{ $division->id }}" {{ old('division_id', $department->division_id) == $division->id ? 'selected' : '' }}>
+                                    {{ $division->name }} ({{ $division->city->name ?? 'N/A' }})
                                 </option>
                             @endforeach
                         </select>
-                        @error('city_id')
+                        @error('division_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

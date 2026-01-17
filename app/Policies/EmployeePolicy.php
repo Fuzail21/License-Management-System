@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\Models\Division;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -11,7 +11,7 @@ class EmployeePolicy
 {
     /**
      * Admin has full unrestricted access.
-     * Managers have city-scoped access through division -> department -> city hierarchy.
+     * Managers have city-scoped access through department -> division -> city hierarchy.
      */
     public function before(User $user, string $ability): ?bool
     {
@@ -51,17 +51,17 @@ class EmployeePolicy
     }
 
     /**
-     * Validate division_id for creation.
+     * Validate department_id for creation.
      */
-    public function createInDivision(User $user, int $divisionId): bool
+    public function createInDepartment(User $user, int $departmentId): bool
     {
         if ($user->isManager()) {
-            $division = Division::with('department')->find($divisionId);
-            if (!$division || !$division->department) {
+            $department = Department::with('division')->find($departmentId);
+            if (!$department || !$department->division) {
                 return false;
             }
 
-            return $this->userManagesCity($user, $division->department->city_id);
+            return $this->userManagesCity($user, $department->division->city_id);
         }
 
         return false;
@@ -80,20 +80,20 @@ class EmployeePolicy
     }
 
     /**
-     * Validate division_id for update (when changing division).
+     * Validate department_id for update (when changing department).
      */
-    public function updateToDivision(User $user, Employee $employee, int $newDivisionId): bool
+    public function updateToDepartment(User $user, Employee $employee, int $newDepartmentId): bool
     {
         if ($user->isManager()) {
-            $currentDivision = $employee->division()->with('department')->first();
-            $newDivision = Division::with('department')->find($newDivisionId);
+            $currentDepartment = $employee->department()->with('division')->first();
+            $newDepartment = Department::with('division')->find($newDepartmentId);
 
-            if (!$currentDivision || !$currentDivision->department || !$newDivision || !$newDivision->department) {
+            if (!$currentDepartment || !$currentDepartment->division || !$newDepartment || !$newDepartment->division) {
                 return false;
             }
 
-            return $this->userManagesCity($user, $currentDivision->department->city_id)
-                && $this->userManagesCity($user, $newDivision->department->city_id);
+            return $this->userManagesCity($user, $currentDepartment->division->city_id)
+                && $this->userManagesCity($user, $newDepartment->division->city_id);
         }
 
         return false;
@@ -136,21 +136,21 @@ class EmployeePolicy
     }
 
     /**
-     * Check if user manages the employee through division -> department -> city hierarchy.
+     * Check if user manages the employee through department -> division -> city hierarchy.
      */
     private function userManagesEmployee(User $user, Employee $employee): bool
     {
-        $division = $employee->division;
-        if (!$division) {
-            return false;
-        }
-
-        $department = $division->department;
+        $department = $employee->department;
         if (!$department) {
             return false;
         }
 
-        return $this->userManagesCity($user, $department->city_id);
+        $division = $department->division;
+        if (!$division) {
+            return false;
+        }
+
+        return $this->userManagesCity($user, $division->city_id);
     }
 
     /**

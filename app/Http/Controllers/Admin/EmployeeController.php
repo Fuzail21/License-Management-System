@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
-use App\Models\Division;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Services\AuditLogService;
 use Illuminate\Http\Request;
@@ -18,12 +18,12 @@ class EmployeeController extends Controller
     public function index(Request $request)
     {
         // Apply city scoping for managers
-        $query = Employee::with(['division.department.city'])
+        $query = Employee::with(['department.division.city'])
             ->forManager();
 
-        // Filter by division
-        if ($request->filled('division_id')) {
-            $query->where('employees.division_id', $request->division_id);
+        // Filter by department
+        if ($request->filled('department_id')) {
+            $query->where('employees.department_id', $request->department_id);
         }
 
         // Filter by status
@@ -43,10 +43,14 @@ class EmployeeController extends Controller
 
         $employees = $query->orderBy('employees.created_at', 'desc')->paginate(15)->withQueryString();
 
-        // Get divisions for filter dropdown (scoped for managers)
-        $divisions = Division::forManager()->active()->orderBy('name')->get();
+        // Get departments for filter dropdown (scoped for managers)
+        $departments = Department::with('division.city')
+            ->forManager()
+            ->active()
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.employees.index', compact('employees', 'divisions'));
+        return view('admin.employees.index', compact('employees', 'departments'));
     }
 
     /**
@@ -56,14 +60,14 @@ class EmployeeController extends Controller
     {
         $this->authorize('create', Employee::class);
 
-        // Get divisions that the user can access
-        $divisions = Division::with('department.city')
+        // Get departments that the user can access
+        $departments = Department::with('division.city')
             ->forManager()
             ->active()
             ->orderBy('name')
             ->get();
 
-        return view('admin.employees.create', compact('divisions'));
+        return view('admin.employees.create', compact('departments'));
     }
 
     /**
@@ -84,7 +88,7 @@ class EmployeeController extends Controller
     {
         $this->authorize('view', $employee);
 
-        $employee->load(['division.department.city', 'userLicenses.license.vendor']);
+        $employee->load(['department.division.city', 'userLicenses.license.vendor']);
 
         return view('admin.employees.show', compact('employee'));
     }
@@ -96,14 +100,14 @@ class EmployeeController extends Controller
     {
         $this->authorize('update', $employee);
 
-        // Get divisions that the user can access
-        $divisions = Division::with('department.city')
+        // Get departments that the user can access
+        $departments = Department::with('division.city')
             ->forManager()
             ->active()
             ->orderBy('name')
             ->get();
 
-        return view('admin.employees.edit', compact('employee', 'divisions'));
+        return view('admin.employees.edit', compact('employee', 'departments'));
     }
 
     /**
@@ -182,15 +186,15 @@ class EmployeeController extends Controller
     {
         $this->authorize('export', Employee::class);
 
-        $filters = $request->only(['division_id', 'status', 'date_from', 'date_to']);
+        $filters = $request->only(['department_id', 'status', 'date_from', 'date_to']);
 
         // Apply city scoping for managers
-        $query = Employee::with(['division.department.city'])
+        $query = Employee::with(['department.division.city'])
             ->forManager();
 
         // Apply filters
-        if (!empty($filters['division_id'])) {
-            $query->where('division_id', $filters['division_id']);
+        if (!empty($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
         }
 
         if (!empty($filters['status'])) {
@@ -234,8 +238,8 @@ class EmployeeController extends Controller
                 'Job Title',
                 'Hire Date',
                 'Status',
-                'Division',
                 'Department',
+                'Division',
                 'City',
             ]);
 
@@ -250,9 +254,9 @@ class EmployeeController extends Controller
                     $employee->job_title,
                     $employee->hire_date,
                     $employee->status,
-                    $employee->division->name ?? 'N/A',
-                    $employee->division->department->name ?? 'N/A',
-                    $employee->division->department->city->name ?? 'N/A',
+                    $employee->department->name ?? 'N/A',
+                    $employee->department->division->name ?? 'N/A',
+                    $employee->department->division->city->name ?? 'N/A',
                 ]);
             }
 

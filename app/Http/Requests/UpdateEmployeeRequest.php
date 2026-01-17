@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Division;
+use App\Models\Department;
 use App\Models\Employee;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -20,14 +20,14 @@ class UpdateEmployeeRequest extends FormRequest
             return false;
         }
 
-        // If manager is changing the division, verify they have access to the new division's city
-        if ($this->user()->isManager() && $this->has('division_id')) {
-            $newDivisionId = $this->division_id;
-            $currentDivisionId = $employee->division_id;
+        // If manager is changing the department, verify they have access to the new department's city
+        if ($this->user()->isManager() && $this->has('department_id')) {
+            $newDepartmentId = $this->department_id;
+            $currentDepartmentId = $employee->department_id;
 
-            // If division is changing, verify manager has access to new division
-            if ($newDivisionId != $currentDivisionId) {
-                return $this->user()->can('updateToDivision', [Employee::class, $employee, $newDivisionId]);
+            // If department is changing, verify manager has access to new department
+            if ($newDepartmentId != $currentDepartmentId) {
+                return $this->user()->can('updateToDepartment', [Employee::class, $employee, $newDepartmentId]);
             }
         }
 
@@ -45,36 +45,36 @@ class UpdateEmployeeRequest extends FormRequest
         $employeeId = $employee->id;
 
         return [
-            'division_id' => [
+            'department_id' => [
                 'required',
                 'integer',
-                Rule::exists('divisions', 'id'),
+                Rule::exists('departments', 'id'),
                 function ($attribute, $value, $fail) use ($employee) {
-                    // Validate division exists and is accessible through city hierarchy
-                    $division = Division::with('department.city')->find($value);
+                    // Validate department exists and is accessible through city hierarchy
+                    $department = Department::with('division.city')->find($value);
 
-                    if (!$division || !$division->department || !$division->department->city) {
-                        $fail('The selected division is invalid or incomplete.');
+                    if (!$department || !$department->division || !$department->division->city) {
+                        $fail('The selected department is invalid or incomplete.');
                         return;
                     }
 
-                    // Managers can only update to divisions they manage
+                    // Managers can only update to departments they manage
                     if ($this->user()->isManager()) {
                         $managedCityIds = $this->user()->managedCities()->pluck('cities.id')->toArray();
 
-                        // Verify manager has access to both current AND new division's city
-                        $currentDivision = $employee->division;
-                        if ($currentDivision && $currentDivision->department) {
-                            $currentCityId = $currentDivision->department->city_id;
+                        // Verify manager has access to both current AND new department's city
+                        $currentDepartment = $employee->department;
+                        if ($currentDepartment && $currentDepartment->division) {
+                            $currentCityId = $currentDepartment->division->city_id;
                             if (!in_array($currentCityId, $managedCityIds)) {
                                 $fail('You do not have permission to update this employee.');
                                 return;
                             }
                         }
 
-                        $newCityId = $division->department->city_id;
+                        $newCityId = $department->division->city_id;
                         if (!in_array($newCityId, $managedCityIds)) {
-                            $fail('You do not have permission to move employees to this division.');
+                            $fail('You do not have permission to move employees to this department.');
                         }
                     }
                 },
@@ -133,8 +133,8 @@ class UpdateEmployeeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'division_id.required' => 'Division is required.',
-            'division_id.exists' => 'The selected division does not exist.',
+            'department_id.required' => 'Department is required.',
+            'department_id.exists' => 'The selected department does not exist.',
             'employee_number.required' => 'Employee number is required.',
             'employee_number.unique' => 'This employee number is already in use.',
             'first_name.required' => 'First name is required.',
@@ -159,10 +159,10 @@ class UpdateEmployeeRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Sanitize division_id
-        if ($this->has('division_id')) {
+        // Sanitize department_id
+        if ($this->has('department_id')) {
             $this->merge([
-                'division_id' => filter_var($this->division_id, FILTER_VALIDATE_INT),
+                'department_id' => filter_var($this->department_id, FILTER_VALIDATE_INT),
             ]);
         }
 

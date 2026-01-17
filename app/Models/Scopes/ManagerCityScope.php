@@ -39,14 +39,18 @@ class ManagerCityScope implements Scope
 
             $table = $model->getTable();
 
-            if ($table === 'departments') {
+            // New hierarchy: City -> Division -> Department -> Employee
+            if ($table === 'divisions') {
+                // Divisions belong directly to cities
                 $builder->whereIn('city_id', $managedCityIds);
-            } elseif ($table === 'divisions') {
-                $builder->whereHas('department', function ($query) use ($managedCityIds) {
+            } elseif ($table === 'departments') {
+                // Departments belong to divisions, which belong to cities
+                $builder->whereHas('division', function ($query) use ($managedCityIds) {
                     $query->whereIn('city_id', $managedCityIds);
                 });
             } elseif ($table === 'employees') {
-                $builder->whereHas('division.department', function ($query) use ($managedCityIds) {
+                // Employees belong to departments -> divisions -> cities
+                $builder->whereHas('department.division', function ($query) use ($managedCityIds) {
                     $query->whereIn('city_id', $managedCityIds);
                 });
             }

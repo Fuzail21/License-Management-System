@@ -70,7 +70,7 @@
         </div>
     </div>
 
-    @if($user->userLicenses->count() > 0)
+    <!-- @if($user->userLicenses->count() > 0)
     <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-200">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Assigned Licenses</h3>
@@ -134,5 +134,5 @@
             <p class="text-sm text-gray-500 text-center">No licenses assigned to this user.</p>
         </div>
     </div>
-    @endif
+    @endif -->
 @endsection

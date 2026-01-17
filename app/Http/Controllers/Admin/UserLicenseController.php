@@ -15,7 +15,7 @@ class UserLicenseController extends Controller
      */
     public function index(Request $request)
     {
-        $query = UserLicense::with(['employee.division.department', 'license.vendor']);
+        $query = UserLicense::with(['employee.department.division', 'license.vendor']);
 
         // Filter by employee
         if ($request->filled('employee_id')) {
@@ -53,18 +53,42 @@ class UserLicenseController extends Controller
     {
         $validated = $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'license_id' => 'required|exists:licenses,id',
+            'license_ids' => 'required|array|min:1',
+            'license_ids.*' => 'required|exists:licenses,id',
             'assigned_date' => 'required|date',
             'status' => 'required|in:active,expired,suspended',
         ]);
 
-        // Add assigned_date as current date
-        $validated['assigned_date'] = now();
+        $createdCount = 0;
 
-        UserLicense::create($validated);
+        foreach ($validated['license_ids'] as $licenseId) {
+            // Check if this assignment already exists
+            $exists = UserLicense::where('employee_id', $validated['employee_id'])
+                ->where('license_id', $licenseId)
+                ->exists();
+
+            if (!$exists) {
+                UserLicense::create([
+                    'employee_id' => $validated['employee_id'],
+                    'license_id' => $licenseId,
+                    'assigned_date' => now(),
+                    'status' => $validated['status'],
+                ]);
+                $createdCount++;
+            }
+        }
+
+        $message = $createdCount === 1
+            ? 'License assigned successfully.'
+            : "{$createdCount} licenses assigned successfully.";
+
+        if ($createdCount === 0) {
+            return redirect()->route('admin.user-licenses.index')
+                ->with('warning', 'All selected licenses were already assigned to this employee.');
+        }
 
         return redirect()->route('admin.user-licenses.index')
-            ->with('success', 'License assigned successfully.');
+            ->with('success', $message);
     }
 
     /**
@@ -72,7 +96,7 @@ class UserLicenseController extends Controller
      */
     public function show(UserLicense $userLicense)
     {
-        $userLicense->load(['employee.division.department', 'license.vendor']);
+        $userLicense->load(['employee.department.division', 'license.vendor']);
 
         return view('admin.user-licenses.show', compact('userLicense'));
     }

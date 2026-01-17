@@ -13,50 +13,48 @@ class Department extends Model
     use HasFactory, HasCityScope;
 
     /**
+     * The table associated with the model.
+     * This table was formerly called "divisions" - linked to divisions (formerly departments).
+     *
+     * @var string
+     */
+    protected $table = 'departments';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'city_id',
+        'division_id',
         'name',
         'status',
     ];
 
     /**
+     * Get the division that the department belongs to.
+     */
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
+    }
+
+    /**
+     * Get the employees for the department.
+     */
+    public function employees(): HasMany
+    {
+        return $this->hasMany(Employee::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
         return [
             'status' => DepartmentStatus::class,
         ];
-    }
-
-    /**
-     * Get the city that the department belongs to.
-     */
-    public function city(): BelongsTo
-    {
-        return $this->belongsTo(City::class);
-    }
-
-    /**
-     * Get the divisions for the department.
-     */
-    public function divisions(): HasMany
-    {
-        return $this->hasMany(Division::class);
-    }
-
-    /**
-     * Get the employees for the department (through divisions).
-     */
-    public function employees()
-    {
-        return $this->hasManyThrough(Employee::class, Division::class);
     }
 
     /**

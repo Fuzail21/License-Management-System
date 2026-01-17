@@ -23,11 +23,11 @@ class City extends Model
     ];
 
     /**
-     * Get the departments for the city.
+     * Get the divisions for the city.
      */
-    public function departments(): HasMany
+    public function divisions(): HasMany
     {
-        return $this->hasMany(Department::class);
+        return $this->hasMany(Division::class);
     }
 
     /**

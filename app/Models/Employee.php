@@ -19,7 +19,7 @@ class Employee extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'division_id',
+        'department_id',
         'employee_number',
         'first_name',
         'last_name',
@@ -43,25 +43,25 @@ class Employee extends Model
     }
 
     /**
-     * Get the division that the employee belongs to.
+     * Get the department that the employee belongs to.
      */
-    public function division(): BelongsTo
+    public function department(): BelongsTo
     {
-        return $this->belongsTo(Division::class);
+        return $this->belongsTo(Department::class);
     }
 
     /**
-     * Get the department through the division.
+     * Get the division through the department.
      */
-    public function department(): HasOneThrough
+    public function division(): HasOneThrough
     {
         return $this->hasOneThrough(
-            Department::class,
             Division::class,
-            'id',           // Foreign key on divisions table
-            'id',           // Foreign key on departments table
-            'division_id',  // Local key on employees table
-            'department_id' // Local key on divisions table
+            Department::class,
+            'id',            // Foreign key on departments table
+            'id',            // Foreign key on divisions table
+            'department_id', // Local key on employees table
+            'division_id'    // Local key on departments table
         );
     }
 

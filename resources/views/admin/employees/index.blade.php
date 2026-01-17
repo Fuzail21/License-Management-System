@@ -16,15 +16,15 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 </div>
 
-                {{-- Division Filter --}}
+                {{-- Department Filter --}}
                 <div>
-                    <label for="division_id" class="block text-sm font-medium text-gray-700">Division</label>
-                    <select name="division_id" id="division_id"
+                    <label for="department_id" class="block text-sm font-medium text-gray-700">Department</label>
+                    <select name="department_id" id="department_id"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="">All Divisions</option>
-                        @foreach ($divisions as $division)
-                            <option value="{{ $division->id }}" {{ request('division_id') == $division->id ? 'selected' : '' }}>
-                                {{ $division->name }}
+                        <option value="">All Departments</option>
+                        @foreach ($departments as $department)
+                            <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
+                                {{ $department->name }} ({{ $department->division->name ?? 'N/A' }})
                             </option>
                         @endforeach
                     </select>
@@ -128,7 +128,7 @@
                                 Email</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Division</th>
+                                Department</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Job Title</th>
@@ -161,7 +161,7 @@
                                     {{ $employee->email ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $employee->division->name ?? 'N/A' }}
+                                    {{ $employee->department->name ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {{ $employee->job_title ?? 'N/A' }}

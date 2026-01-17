@@ -166,7 +166,7 @@
                     @enderror
                 </div>
 
-                <div>
+                <!-- <div>
                     <label for="number_license_assigned" class="block text-sm font-medium text-gray-700">Number of Licenses<span class="text-red-500">*</span></label>
                     <div class="mt-1 relative rounded-md shadow-sm">
                         {{-- <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -177,6 +177,17 @@
                             placeholder="0.00">
                     </div>
                     @error('number_license_assigned')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div> -->
+
+                <div>
+                    <label for="renewal_date" class="block text-sm font-medium text-gray-700">Renewal Date</label>
+                    <div class="mt-1">
+                        <input type="date" name="renewal_date" id="renewal_date" value="{{ old('renewal_date') }}"
+                            class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2 border">
+                    </div>
+                    @error('renewal_date')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

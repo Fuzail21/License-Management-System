@@ -25,6 +25,7 @@ class License extends Model
         'version',
         'max_users',
         'cost',
+        'renewal_date',
         'description',
         'status',
         'created_by',
@@ -46,6 +47,7 @@ class License extends Model
             'license_type' => LicenseType::class,
             'status' => LicenseStatus::class,
             'approved_at' => 'datetime',
+            'renewal_date' => 'date',
         ];
     }
 

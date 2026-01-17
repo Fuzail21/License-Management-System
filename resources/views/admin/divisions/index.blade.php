@@ -16,15 +16,15 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                 </div>
 
-                {{-- Department Filter --}}
+                {{-- City Filter --}}
                 <div>
-                    <label for="department_id" class="block text-sm font-medium text-gray-700">Department</label>
-                    <select name="department_id" id="department_id"
+                    <label for="city_id" class="block text-sm font-medium text-gray-700">City</label>
+                    <select name="city_id" id="city_id"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="">All Departments</option>
-                        @foreach ($departments as $department)
-                            <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
-                                {{ $department->name }}
+                        <option value="">All Cities</option>
+                        @foreach ($cities as $city)
+                            <option value="{{ $city->id }}" {{ request('city_id') == $city->id ? 'selected' : '' }}>
+                                {{ $city->name }}
                             </option>
                         @endforeach
                     </select>
@@ -76,11 +76,9 @@
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                             <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                            <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
                             <th scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employees</th>
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departments</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th scope="col"
@@ -93,14 +91,11 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $division->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $division->department->name ?? 'N/A' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $division->department->city->name ?? 'N/A' }}
+                                    {{ $division->city->name ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {{ $division->employees_count ?? 0 }} {{ Str::plural('employee', $division->employees_count ?? 0) }}
+                                        {{ $division->departments_count ?? 0 }} {{ Str::plural('department', $division->departments_count ?? 0) }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -157,7 +152,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">
+                                <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-500">
                                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

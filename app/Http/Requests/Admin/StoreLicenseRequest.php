@@ -30,6 +30,7 @@ class StoreLicenseRequest extends FormRequest
             'version' => 'nullable|string|max:50',
             'max_users' => 'nullable|integer|min:1',
             'cost' => 'required|numeric|min:0',
+            'renewal_date' => 'nullable|date',
             'description' => 'nullable|string',
         ];
     }

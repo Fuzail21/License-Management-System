@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\City;
+use App\Models\Division;
 use App\Models\Department;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -14,14 +14,8 @@ class StoreDepartmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Check basic create permission
         if (!$this->user()->can('create', Department::class)) {
             return false;
-        }
-
-        // For managers, verify they manage the specified city
-        if ($this->user()->isManager() && $this->has('city_id')) {
-            return $this->user()->can('createInCity', [Department::class, $this->city_id]);
         }
 
         return true;
@@ -29,29 +23,37 @@ class StoreDepartmentRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'city_id' => [
+            'division_ids' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'division_ids.*' => [
                 'required',
                 'integer',
-                Rule::exists('cities', 'id'),
+                Rule::exists('divisions', 'id'),
                 function ($attribute, $value, $fail) {
-                    // Validate city exists and is accessible
-                    $city = City::find($value);
+                    // Validate division exists and is accessible through city hierarchy
+                    $division = Division::with('city')->find($value);
 
-                    if (!$city) {
-                        $fail('The selected city does not exist.');
+                    if (!$division || !$division->city) {
+                        $fail('One of the selected divisions is invalid or incomplete.');
                         return;
                     }
 
-                    // Managers can only create in cities they manage
+                    // Managers can only create departments in divisions they manage
                     if ($this->user()->isManager()) {
+                        $cityId = $division->city_id;
                         $managedCityIds = $this->user()->managedCities()->pluck('cities.id')->toArray();
 
-                        if (!in_array($value, $managedCityIds)) {
-                            $fail('You do not have permission to create departments in this city.');
+                        if (!in_array($cityId, $managedCityIds)) {
+                            $fail('You do not have permission to create departments in one or more selected divisions.');
                         }
                     }
                 },
@@ -76,8 +78,10 @@ class StoreDepartmentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'city_id.required' => 'City is required.',
-            'city_id.exists' => 'The selected city does not exist.',
+            'division_ids.required' => 'At least one division is required.',
+            'division_ids.array' => 'Divisions must be an array.',
+            'division_ids.min' => 'At least one division must be selected.',
+            'division_ids.*.exists' => 'One of the selected divisions does not exist.',
             'name.required' => 'Department name is required.',
             'name.min' => 'Department name must be at least 2 characters.',
             'name.max' => 'Department name cannot exceed 255 characters.',
@@ -91,17 +95,26 @@ class StoreDepartmentRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // Sanitize division_ids
+        if ($this->has('division_ids') && is_array($this->division_ids)) {
+            $this->merge([
+                'division_ids' => array_map(function ($id) {
+                    return filter_var($id, FILTER_VALIDATE_INT);
+                }, $this->division_ids),
+            ]);
+        }
+
+        // Sanitize name
+        if ($this->has('name')) {
+            $this->merge([
+                'name' => trim($this->name),
+            ]);
+        }
+
         // Set default status if not provided
         if (!$this->has('status')) {
             $this->merge([
                 'status' => 'active',
-            ]);
-        }
-
-        // Clean city_id (prevent string injection)
-        if ($this->has('city_id')) {
-            $this->merge([
-                'city_id' => filter_var($this->city_id, FILTER_VALIDATE_INT),
             ]);
         }
     }

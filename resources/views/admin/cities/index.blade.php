@@ -67,7 +67,7 @@
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Departments</th>
+                            Divisions</th>
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Managers
                         </th>
@@ -90,8 +90,8 @@
                             <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $city->departments_count }}
-                                    {{ Str::plural('department', $city->departments_count) }}
+                                    {{ $city->divisions_count }}
+                                    {{ Str::plural('division', $city->divisions_count) }}
                                 </span>
                             </td>
                             <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">

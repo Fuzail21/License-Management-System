@@ -79,21 +79,21 @@
                         </div>
                     </div>
 
-                    {{-- Division Selection --}}
+                    {{-- Department Selection --}}
                     <div>
-                        <label for="division_id" class="block text-sm font-medium text-gray-700">
-                            Division <span class="text-red-500">*</span>
+                        <label for="department_id" class="block text-sm font-medium text-gray-700">
+                            Department <span class="text-red-500">*</span>
                         </label>
-                        <select name="division_id" id="division_id" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('division_id') border-red-300 @enderror">
-                            <option value="">-- Select Division --</option>
-                            @foreach ($divisions as $division)
-                                <option value="{{ $division->id }}" {{ old('division_id') == $division->id ? 'selected' : '' }}>
-                                    {{ $division->name }} ({{ $division->department->name ?? 'N/A' }})
+                        <select name="department_id" id="department_id" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('department_id') border-red-300 @enderror">
+                            <option value="">-- Select Department --</option>
+                            @foreach ($departments as $department)
+                                <option value="{{ $department->id }}" {{ old('department_id') == $department->id ? 'selected' : '' }}>
+                                    {{ $department->name }} ({{ $department->division->name ?? 'N/A' }} - {{ $department->division->city->name ?? 'N/A' }})
                                 </option>
                             @endforeach
                         </select>
-                        @error('division_id')
+                        @error('department_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

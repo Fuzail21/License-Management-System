@@ -48,7 +48,7 @@ class DashboardController extends Controller
         }
 
         // Recent licenses - scoped for managers, all for admins
-        $recentLicensesQuery = UserLicense::with(['employee.division.department.city', 'license.vendor'])
+        $recentLicensesQuery = UserLicense::with(['employee.department.division.city', 'license.vendor'])
             ->orderBy('created_at', 'desc')
             ->limit(10);
 

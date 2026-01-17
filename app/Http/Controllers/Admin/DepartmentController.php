@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
-use App\Models\City;
+use App\Models\Division;
 use App\Models\Department;
 use App\Services\AuditLogService;
 use App\Services\DepartmentService;
@@ -26,13 +26,13 @@ class DepartmentController extends Controller
     public function index(Request $request)
     {
         // Apply city scoping for managers
-        $query = Department::with(['city', 'divisions'])
+        $query = Department::with(['division.city', 'employees'])
             ->forManager()
-            ->withCount('divisions');
+            ->withCount('employees');
 
-        // Filter by city
-        if ($request->filled('city_id')) {
-            $query->where('departments.city_id', $request->city_id);
+        // Filter by division
+        if ($request->filled('division_id')) {
+            $query->where('departments.division_id', $request->division_id);
         }
 
         // Filter by status
@@ -47,10 +47,10 @@ class DepartmentController extends Controller
 
         $departments = $query->orderBy('departments.created_at', 'desc')->paginate(15)->withQueryString();
 
-        // Get cities for filter dropdown (scoped for managers)
-        $cities = City::forManager()->active()->orderBy('name')->get();
+        // Get divisions for filter dropdown (scoped for managers)
+        $divisions = Division::forManager()->active()->orderBy('name')->get();
 
-        return view('admin.departments.index', compact('departments', 'cities'));
+        return view('admin.departments.index', compact('departments', 'divisions'));
     }
 
     /**
@@ -60,10 +60,10 @@ class DepartmentController extends Controller
     {
         $this->authorize('create', Department::class);
 
-        // Get cities that the user can access
-        $cities = City::forManager()->active()->orderBy('name')->get();
+        // Get divisions that the user can access
+        $divisions = Division::forManager()->active()->orderBy('name')->get();
 
-        return view('admin.departments.create', compact('cities'));
+        return view('admin.departments.create', compact('divisions'));
     }
 
     /**
@@ -71,10 +71,25 @@ class DepartmentController extends Controller
      */
     public function store(StoreDepartmentRequest $request)
     {
-        $department = Department::create($request->validated());
+        $validated = $request->validated();
+        $divisionIds = $validated['division_ids'];
+        $createdCount = 0;
+
+        foreach ($divisionIds as $divisionId) {
+            Department::create([
+                'division_id' => $divisionId,
+                'name' => $validated['name'],
+                'status' => $validated['status'],
+            ]);
+            $createdCount++;
+        }
+
+        $message = $createdCount === 1
+            ? 'Department created successfully.'
+            : "Department created successfully in {$createdCount} divisions.";
 
         return redirect()->route('admin.departments.index')
-            ->with('success', 'Department created successfully.');
+            ->with('success', $message);
     }
 
     /**
@@ -84,17 +99,11 @@ class DepartmentController extends Controller
     {
         $this->authorize('view', $department);
 
-        $department->load([
-            'city',
-            'divisions.employees' => fn ($q) =>
-                $q->where('employees.status', 'active')
-        ]);
-
+        $department->load(['division.city', 'employees']);
         $stats = $this->departmentService->getStatistics($department);
 
         return view('admin.departments.show', compact('department', 'stats'));
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -103,10 +112,10 @@ class DepartmentController extends Controller
     {
         $this->authorize('update', $department);
 
-        // Get cities that the user can access
-        $cities = City::forManager()->active()->orderBy('name')->get();
+        // Get divisions that the user can access
+        $divisions = Division::forManager()->active()->orderBy('name')->get();
 
-        return view('admin.departments.edit', compact('department', 'cities'));
+        return view('admin.departments.edit', compact('department', 'divisions'));
     }
 
     /**
@@ -137,7 +146,7 @@ class DepartmentController extends Controller
                 [
                     'department_id' => $department->id,
                     'department_name' => $department->name,
-                    'divisions_count' => $canDelete['divisions_count'],
+                    'employees_count' => $canDelete['employees_count'],
                 ]
             );
 
@@ -155,23 +164,6 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Toggle department status.
-     */
-    public function toggleStatus(Department $department)
-    {
-        $this->authorize('update', $department);
-
-        $oldStatus = $department->status->value;
-        $newStatus = $department->isActive() ? 'inactive' : 'active';
-
-        $department->status = $newStatus;
-        $department->save();
-
-        return redirect()->back()
-            ->with('success', 'Department status updated successfully.');
-    }
-
-    /**
      * Force cascade delete (admin only).
      */
     public function forceDelete(Department $department)
@@ -183,7 +175,7 @@ class DepartmentController extends Controller
         if ($result['success']) {
             return redirect()->route('admin.departments.index')
                 ->with('success', $result['message'])
-                ->with('warning', 'Cascade delete removed ' . $result['deleted']['divisions'] . ' divisions and ' . $result['deleted']['employees'] . ' employees.');
+                ->with('warning', 'Cascade delete removed ' . $result['deleted']['employees'] . ' employees.');
         }
 
         return back()->with('error', $result['message']);

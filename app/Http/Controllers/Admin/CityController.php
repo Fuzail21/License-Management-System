@@ -27,7 +27,7 @@ class CityController extends Controller
      */
     public function index(Request $request)
     {
-        $query = City::withCount(['departments', 'managers']);
+        $query = City::withCount(['divisions', 'managers']);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -75,7 +75,7 @@ class CityController extends Controller
     {
         $this->authorize('view', $city);
 
-        $city->load(['departments.divisions', 'managers']);
+        $city->load(['divisions.departments', 'managers']);
         $stats = $this->cityService->getStatistics($city);
 
         return view('admin.cities.show', compact('city', 'stats'));
@@ -119,7 +119,7 @@ class CityController extends Controller
                 [
                     'city_id' => $city->id,
                     'city_name' => $city->name,
-                    'departments_count' => $canDelete['departments_count'],
+                    'divisions_count' => $canDelete['divisions_count'],
                     'managers_count' => $canDelete['managers_count'],
                 ]
             );

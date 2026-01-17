@@ -16,21 +16,21 @@
                 @method('PUT')
 
                 <div class="px-6 py-4 space-y-6">
-                    {{-- Department Selection --}}
+                    {{-- City Selection --}}
                     <div>
-                        <label for="department_id" class="block text-sm font-medium text-gray-700">
-                            Department <span class="text-red-500">*</span>
+                        <label for="city_id" class="block text-sm font-medium text-gray-700">
+                            City <span class="text-red-500">*</span>
                         </label>
-                        <select name="department_id" id="department_id" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('department_id') border-red-300 @enderror">
-                            <option value="">-- Select Department --</option>
-                            @foreach ($departments as $department)
-                                <option value="{{ $department->id }}" {{ old('department_id', $division->department_id) == $department->id ? 'selected' : '' }}>
-                                    {{ $department->name }} ({{ $department->city->name ?? 'N/A' }})
+                        <select name="city_id" id="city_id" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm @error('city_id') border-red-300 @enderror">
+                            <option value="">-- Select City --</option>
+                            @foreach ($cities as $city)
+                                <option value="{{ $city->id }}" {{ old('city_id', $division->city_id) == $city->id ? 'selected' : '' }}>
+                                    {{ $city->name }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('department_id')
+                        @error('city_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>

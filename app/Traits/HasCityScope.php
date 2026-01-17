@@ -55,21 +55,21 @@ trait HasCityScope
             return $query->whereIn('id', $managedCityIds);
         }
 
-        // Departments: Scoped by city_id
-        if ($table === 'departments') {
+        // Divisions: Scoped by city_id (divisions belong directly to cities)
+        if ($table === 'divisions') {
             return $query->whereIn('city_id', $managedCityIds);
         }
 
-        // Divisions: Scoped through department's city_id
-        if ($table === 'divisions') {
-            return $query->whereHas('department', function ($q) use ($managedCityIds) {
+        // Departments: Scoped through division's city_id
+        if ($table === 'departments') {
+            return $query->whereHas('division', function ($q) use ($managedCityIds) {
                 $q->whereIn('city_id', $managedCityIds);
             });
         }
 
-        // Employees: Scoped through division → department → city
+        // Employees: Scoped through department → division → city
         if ($table === 'employees') {
-            return $query->whereHas('division.department', function ($q) use ($managedCityIds) {
+            return $query->whereHas('department.division', function ($q) use ($managedCityIds) {
                 $q->whereIn('city_id', $managedCityIds);
             });
         }

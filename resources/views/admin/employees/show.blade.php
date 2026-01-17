@@ -44,24 +44,24 @@
                     </div>
 
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Division</dt>
+                        <dt class="text-sm font-medium text-gray-500">Department</dt>
                         <dd class="mt-1 text-sm text-gray-900">
-                            @if($employee->division)
-                                <a href="{{ route('admin.divisions.show', $employee->division) }}" class="text-indigo-600 hover:text-indigo-900">
-                                    {{ $employee->division->name }}
+                            @if($employee->department)
+                                <a href="{{ route('admin.departments.show', $employee->department) }}" class="text-indigo-600 hover:text-indigo-900">
+                                    {{ $employee->department->name }}
                                 </a>
                             @else
-                                <span class="text-gray-400">No division assigned</span>
+                                <span class="text-gray-400">No department assigned</span>
                             @endif
                         </dd>
                     </div>
 
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">Department</dt>
+                        <dt class="text-sm font-medium text-gray-500">Division</dt>
                         <dd class="mt-1 text-sm text-gray-900">
-                            @if($employee->division && $employee->division->department)
-                                <a href="{{ route('admin.departments.show', $employee->division->department) }}" class="text-indigo-600 hover:text-indigo-900">
-                                    {{ $employee->division->department->name }}
+                            @if($employee->department && $employee->department->division)
+                                <a href="{{ route('admin.divisions.show', $employee->department->division) }}" class="text-indigo-600 hover:text-indigo-900">
+                                    {{ $employee->department->division->name }}
                                 </a>
                             @else
                                 <span class="text-gray-400">N/A</span>
@@ -72,8 +72,8 @@
                     <div>
                         <dt class="text-sm font-medium text-gray-500">City</dt>
                         <dd class="mt-1 text-sm text-gray-900">
-                            @if($employee->division && $employee->division->department && $employee->division->department->city)
-                                {{ $employee->division->department->city->name }}
+                            @if($employee->department && $employee->department->division && $employee->department->division->city)
+                                {{ $employee->department->division->city->name }}
                             @else
                                 <span class="text-gray-400">N/A</span>
                             @endif
@@ -137,7 +137,7 @@
                             class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status
                         </th>
                         <th scope="col"
-                            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions
                         </th>
                     </tr>
                 </thead>

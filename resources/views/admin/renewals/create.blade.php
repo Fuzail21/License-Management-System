@@ -22,11 +22,11 @@
                     <dt class="text-gray-500">License Type:</dt>
                     <dd class="text-gray-900 uppercase">{{ $license->renewal_type }}</dd>
                     
-                    <dt class="text-gray-500">Total Seats:</dt>
+                    <dt class="text-gray-500">Total Licenses:</dt>
                     <dd class="text-gray-900">{{ $license->max_users ?? 'Unlimited' }}</dd>
 
-                    <dt class="text-gray-500">Assigned Seats:</dt>
-                    <dd class="text-gray-900">{{ $license->number_license_assigned }}</dd>
+                    <dt class="text-gray-500">Assigned Licenses:</dt>
+                    <dd class="text-gray-900">{{ $license->userLicenses()->count() }}</dd>
                 </dl>
             </div>
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Division;
+use App\Models\Department;
 use App\Models\Employee;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,9 +19,9 @@ class StoreEmployeeRequest extends FormRequest
             return false;
         }
 
-        // For managers, verify they manage the division's city
-        if ($this->user()->isManager() && $this->has('division_id')) {
-            return $this->user()->can('createInDivision', [Employee::class, $this->division_id]);
+        // For managers, verify they manage the department's division's city
+        if ($this->user()->isManager() && $this->has('department_id')) {
+            return $this->user()->can('createInDepartment', [Employee::class, $this->department_id]);
         }
 
         return true;
@@ -33,26 +33,26 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'division_id' => [
+            'department_id' => [
                 'required',
                 'integer',
-                Rule::exists('divisions', 'id'),
+                Rule::exists('departments', 'id'),
                 function ($attribute, $value, $fail) {
-                    // Validate division exists and is accessible through city hierarchy
-                    $division = Division::with('department.city')->find($value);
+                    // Validate department exists and is accessible through city hierarchy
+                    $department = Department::with('division.city')->find($value);
 
-                    if (!$division || !$division->department || !$division->department->city) {
-                        $fail('The selected division is invalid or incomplete.');
+                    if (!$department || !$department->division || !$department->division->city) {
+                        $fail('The selected department is invalid or incomplete.');
                         return;
                     }
 
-                    // Managers can only create employees in divisions they manage
+                    // Managers can only create employees in departments they manage
                     if ($this->user()->isManager()) {
-                        $cityId = $division->department->city_id;
+                        $cityId = $department->division->city_id;
                         $managedCityIds = $this->user()->managedCities()->pluck('cities.id')->toArray();
 
                         if (!in_array($cityId, $managedCityIds)) {
-                            $fail('You do not have permission to create employees in this division.');
+                            $fail('You do not have permission to create employees in this department.');
                         }
                     }
                 },
@@ -105,8 +105,8 @@ class StoreEmployeeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'division_id.required' => 'Division is required.',
-            'division_id.exists' => 'The selected division does not exist.',
+            'department_id.required' => 'Department is required.',
+            'department_id.exists' => 'The selected department does not exist.',
             'employee_number.required' => 'Employee number is required.',
             'employee_number.unique' => 'This employee number is already in use.',
             'first_name.required' => 'First name is required.',
@@ -134,10 +134,10 @@ class StoreEmployeeRequest extends FormRequest
             ]);
         }
 
-        // Clean division_id (prevent string injection)
-        if ($this->has('division_id')) {
+        // Clean department_id (prevent string injection)
+        if ($this->has('department_id')) {
             $this->merge([
-                'division_id' => filter_var($this->division_id, FILTER_VALIDATE_INT),
+                'department_id' => filter_var($this->department_id, FILTER_VALIDATE_INT),
             ]);
         }
 
@@ -162,4 +162,3 @@ class StoreEmployeeRequest extends FormRequest
         }
     }
 }
-

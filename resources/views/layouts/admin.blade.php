@@ -78,17 +78,17 @@
                     </x-nav-link>
                 @endcan
 
-                @can('viewAny', App\Models\Department::class)
-                    <x-nav-link :href="route('admin.departments.index')" :active="request()->routeIs('admin.departments.*')"
+                @can('viewAny', App\Models\Division::class)
+                    <x-nav-link :href="route('admin.divisions.index')" :active="request()->routeIs('admin.divisions.*')"
                         icon="building-office">
-                        Departments
+                        Divisions
                     </x-nav-link>
                 @endcan
 
-                @can('viewAny', App\Models\Division::class)
-                    <x-nav-link :href="route('admin.divisions.index')" :active="request()->routeIs('admin.divisions.*')"
+                @can('viewAny', App\Models\Department::class)
+                    <x-nav-link :href="route('admin.departments.index')" :active="request()->routeIs('admin.departments.*')"
                         icon="building-office-2">
-                        Divisions
+                        Departments
                     </x-nav-link>
                 @endcan
 

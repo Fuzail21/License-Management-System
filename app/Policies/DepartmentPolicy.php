@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Division;
 use App\Models\Department;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
@@ -10,7 +11,7 @@ class DepartmentPolicy
 {
     /**
      * Admin has full unrestricted access.
-     * Managers have city-scoped access.
+     * Managers have city-scoped access through division hierarchy.
      */
     public function before(User $user, string $ability): ?bool
     {
@@ -35,7 +36,7 @@ class DepartmentPolicy
     public function view(User $user, Department $department): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $department->city_id);
+            return $this->userManagesDepartment($user, $department);
         }
 
         return false;
@@ -50,12 +51,17 @@ class DepartmentPolicy
     }
 
     /**
-     * Validate city_id for creation.
+     * Validate division_id for creation.
      */
-    public function createInCity(User $user, int $cityId): bool
+    public function createInDivision(User $user, int $divisionId): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $cityId);
+            $division = Division::find($divisionId);
+            if (!$division) {
+                return false;
+            }
+
+            return $this->userManagesCity($user, $division->city_id);
         }
 
         return false;
@@ -67,20 +73,27 @@ class DepartmentPolicy
     public function update(User $user, Department $department): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $department->city_id);
+            return $this->userManagesDepartment($user, $department);
         }
 
         return false;
     }
 
     /**
-     * Validate city_id for update (when changing city).
+     * Validate division_id for update (when changing division).
      */
-    public function updateToCity(User $user, Department $department, int $newCityId): bool
+    public function updateToDivision(User $user, Department $department, int $newDivisionId): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $department->city_id)
-                && $this->userManagesCity($user, $newCityId);
+            $currentDivision = $department->division;
+            $newDivision = Division::find($newDivisionId);
+
+            if (!$currentDivision || !$newDivision) {
+                return false;
+            }
+
+            return $this->userManagesCity($user, $currentDivision->city_id)
+                && $this->userManagesCity($user, $newDivision->city_id);
         }
 
         return false;
@@ -92,7 +105,7 @@ class DepartmentPolicy
     public function delete(User $user, Department $department): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $department->city_id);
+            return $this->userManagesDepartment($user, $department);
         }
 
         return false;
@@ -104,7 +117,7 @@ class DepartmentPolicy
     public function restore(User $user, Department $department): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $department->city_id);
+            return $this->userManagesDepartment($user, $department);
         }
 
         return false;
@@ -116,10 +129,23 @@ class DepartmentPolicy
     public function forceDelete(User $user, Department $department): bool
     {
         if ($user->isManager()) {
-            return $this->userManagesCity($user, $department->city_id);
+            return $this->userManagesDepartment($user, $department);
         }
 
         return false;
+    }
+
+    /**
+     * Check if user manages the department through its division's city.
+     */
+    private function userManagesDepartment(User $user, Department $department): bool
+    {
+        $division = $department->division;
+        if (!$division) {
+            return false;
+        }
+
+        return $this->userManagesCity($user, $division->city_id);
     }
 
     /**

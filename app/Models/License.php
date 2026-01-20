@@ -130,6 +130,22 @@ class License extends Model
     {
         return $this->status === LicenseStatus::Rejected;
     }
+
+    /**
+     * Get the remaining days until renewal.
+     */
+    public function getRemainingDaysAttribute(): int
+    {
+        if (!$this->renewal_date) {
+            return 0;
+        }
+
+        $renewalDate = $this->renewal_date instanceof \Carbon\Carbon
+            ? $this->renewal_date
+            : \Carbon\Carbon::parse($this->renewal_date);
+
+        return (int) \Carbon\Carbon::today()->diffInDays($renewalDate, false);
+    }
 }
 
 enum LicenseType: string

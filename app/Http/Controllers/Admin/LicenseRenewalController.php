@@ -13,19 +13,20 @@ use Illuminate\Support\Facades\Auth;
 class LicenseRenewalController extends Controller
 {
     /**
-     * Display a listing of renewals.
+     * Display a listing of licenses with renewal tracking.
      */
     public function index(Request $request)
     {
-        $query = LicenseRenewal::with('license.vendor');
+        $licenses = License::with('vendor')
+            ->withCount('userLicenses')
+            ->approved()
+            ->get()
+            ->sortBy(function ($license) {
+                return $license->remaining_days;
+            })
+            ->values();
 
-        if ($request->has('license_id') && $request->license_id !== '') {
-            $query->where('license_id', $request->license_id);
-        }
-
-        $renewals = $query->orderBy('renewed_at', 'desc')->paginate(15);
-
-        return view('admin.renewals.index', compact('renewals'));
+        return view('admin.renewals.index', compact('licenses'));
     }
 
     /**

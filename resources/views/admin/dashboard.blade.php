@@ -238,7 +238,7 @@
                                 {{ $userLicense->license->vendor->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <x-status-badge :status="$userLicense->status->value" />
-                                <x-expiry-badge :expiryDate="$userLicense->expiry_date" :status="$userLicense->status->value" />
+                                <x-expiry-badge :expiryDate="$userLicense->license->renewal_date" :status="$userLicense->status->value" />
                             </td>
                         </tr>
                     @empty

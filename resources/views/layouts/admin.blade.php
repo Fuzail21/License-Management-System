@@ -123,6 +123,11 @@
                     Renewals
                 </x-nav-link>
 
+                <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')"
+                    icon="chart-bar">
+                    Reports
+                </x-nav-link>
+
                 @if(auth()->user()->role && auth()->user()->role->name === 'Admin')
 
                     <div class="pt-4 pb-2 px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">

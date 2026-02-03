@@ -25,8 +25,8 @@
                 </a>
 
                 <!-- Renew Button -->
-                <a href="{{ route('admin.renewals.create', $license->id) }}"
-                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-black border border-black border-solid">
+                <a href="{{ route('admin.licenses.renew.form', $license) }}"
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-green-800 bg-green-100 hover:bg-green-200 transition">
                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                          stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -108,6 +108,127 @@
                 </div>
             </dl>
         </div>
+    </div>
+
+    {{-- Renewal History Section --}}
+    <div class="mt-8 bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Renewal History</h3>
+                    <p class="mt-1 text-sm text-gray-500">Track all changes to the license renewal date</p>
+                </div>
+                @if(isset($renewalStats))
+                <div class="flex gap-4 text-sm">
+                    <div class="text-center px-3 py-1 bg-green-50 rounded">
+                        <span class="block font-semibold text-green-700">{{ $renewalStats['total_renewals'] }}</span>
+                        <span class="text-green-600 text-xs">Renewals</span>
+                    </div>
+                    <div class="text-center px-3 py-1 bg-blue-50 rounded">
+                        <span class="block font-semibold text-blue-700">{{ $renewalStats['total_extensions'] }}</span>
+                        <span class="text-blue-600 text-xs">Extensions</span>
+                    </div>
+                    <div class="text-center px-3 py-1 bg-yellow-50 rounded">
+                        <span class="block font-semibold text-yellow-700">{{ $renewalStats['total_corrections'] }}</span>
+                        <span class="text-yellow-600 text-xs">Corrections</span>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        @if($license->renewalHistories && $license->renewalHistories->count() > 0)
+        <div class="px-5 py-4">
+            {{-- Timeline View --}}
+            <div class="flow-root">
+                <ul role="list" class="-mb-8">
+                    @foreach($license->renewalHistories as $index => $history)
+                    <li>
+                        <div class="relative pb-8">
+                            @if(!$loop->last)
+                            <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                            @endif
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    @php
+                                        $iconBg = match($history->change_type?->value ?? $history->change_type) {
+                                            'renewal' => 'bg-green-500',
+                                            'extension' => 'bg-blue-500',
+                                            'correction' => 'bg-yellow-500',
+                                            'initial' => 'bg-gray-400',
+                                            default => 'bg-gray-400',
+                                        };
+                                    @endphp
+                                    <span class="h-8 w-8 rounded-full {{ $iconBg }} flex items-center justify-center ring-8 ring-white">
+                                        @if(($history->change_type?->value ?? $history->change_type) === 'renewal')
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        @elseif(($history->change_type?->value ?? $history->change_type) === 'extension')
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        @elseif(($history->change_type?->value ?? $history->change_type) === 'correction')
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        @else
+                                        <svg class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        </svg>
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                    <div>
+                                        <p class="text-sm text-gray-900">
+                                            <span class="font-medium">
+                                                {{ ucfirst($history->change_type?->value ?? $history->change_type ?? 'Update') }}
+                                            </span>
+                                            @if($history->old_renewal_date)
+                                                - Changed from
+                                                <span class="font-medium text-red-600">{{ $history->old_renewal_date->format('M d, Y') }}</span>
+                                                to
+                                            @else
+                                                - Set to
+                                            @endif
+                                            <span class="font-medium text-green-600">{{ $history->new_renewal_date->format('M d, Y') }}</span>
+                                        </p>
+                                        @if($history->reason)
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            <span class="font-medium">Reason:</span> {{ $history->reason }}
+                                        </p>
+                                        @endif
+                                        @if($history->renewal_cost)
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            <span class="font-medium">Cost:</span> ${{ number_format($history->renewal_cost, 2) }}
+                                        </p>
+                                        @endif
+                                    </div>
+                                    <div class="whitespace-nowrap text-right text-sm text-gray-500">
+                                        <div>{{ $history->changed_at->format('M d, Y') }}</div>
+                                        <div class="text-xs">{{ $history->changed_at->format('h:i A') }}</div>
+                                        @if($history->changedByUser)
+                                        <div class="text-xs text-gray-400 mt-1">by {{ $history->changedByUser->name }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        @else
+        <div class="px-5 py-8 text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="mt-2 text-sm text-gray-500">No renewal history recorded yet.</p>
+            <p class="text-xs text-gray-400">History will be tracked when the renewal date is updated.</p>
+        </div>
+        @endif
     </div>
 
     @if($license->userLicenses->count() > 0)

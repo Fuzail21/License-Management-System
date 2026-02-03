@@ -61,27 +61,26 @@
                             <td class="px-4 py-4 whitespace-nowrap text-center text-sm">
                                 @if($license->renewal_date)
                                     @php
-                                        $remainingDays = $license->remaining_days;
+                                        // 1. Convert the string/date into a Carbon object
+                                        $renewalDate = \Illuminate\Support\Carbon::parse($license->renewal_date)->startOfDay();
+
+                                        // 2. Compare it to 'now' to get the actual INTEGER count of days
+                                        // The 'false' parameter allows negative numbers if the date has passed
+                                        $remainingDays = now()->startOfDay()->diffInDays($renewalDate, false);
                                     @endphp
                                     @if($remainingDays < 0)
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-500 text-white" style="background-color: red;"
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800"
                                               title="Renewal date: {{ $license->renewal_date->format('M d, Y') }}">
                                             Expired ({{ abs($remainingDays) }} days ago)
                                         </span>
-                                    @elseif($remainingDays <= 2)
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-500 text-white animate-pulse" style="background-color:rgb(255, 92, 92);"
-                                              title="Renewal date: {{ $license->renewal_date->format('M d, Y') }}">
-                                            {{ $remainingDays }} {{ $remainingDays == 1 ? 'day' : 'days' }}
-                                        </span>
-                                    @elseif($remainingDays <= 10)
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-400 text-black" style="background-color: #FFC300;"
-                                              title="Renewal date: {{ $license->renewal_date->format('M d, Y') }}">
-                                            {{ $remainingDays }} days
+                                    @elseif($remainingDays <= 7)
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold animate-pulse bg-yellow-100 text-yellow-800"                                             title="Renewal date: {{ $license->renewal_date->format('M d, Y') }}">
+                                            {{ $remainingDays }} {{ $remainingDays == 1 ? 'day' : 'days' }} - Expiring Soon
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-500 text-white" style="background-color: green;"
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800"
                                               title="Renewal date: {{ $license->renewal_date->format('M d, Y') }}">
-                                            {{ $remainingDays }} days
+                                            {{ $remainingDays }} days remaining
                                         </span>
                                     @endif
                                 @else
@@ -106,7 +105,7 @@
                                                   d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
                                     </a>
-                                    <a href="{{ route('admin.renewals.create', $license) }}"
+                                    <a href="{{ route('admin.licenses.renew.form', $license) }}"
                                        class="text-green-600 hover:text-green-900 transition-colors duration-200"
                                        title="Renew License">
                                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -138,26 +137,23 @@
         </div>
 
         {{-- Legend --}}
-        <!-- <div class="px-5 py-4 border-t border-gray-200 bg-gray-50">
+        <div class="px-5 py-4 border-t border-gray-200 bg-gray-50">
             <div class="flex flex-wrap items-center gap-4 text-xs">
                 <span class="font-medium text-gray-700">Legend:</span>
-                <span class="inline-flex items-center">
-                    <span class="w-3 h-3 rounded-full bg-red-500 mr-1.5"></span>
-                    Critical (0-2 days)
-                </span>
-                <span class="inline-flex items-center">
-                    <span class="w-3 h-3 rounded-full bg-yellow-400 mr-1.5"></span>
-                    Warning (3-10 days)
-                </span>
-                <span class="inline-flex items-center">
-                    <span class="w-3 h-3 rounded-full bg-green-500 mr-1.5"></span>
-                    Safe (10+ days)
-                </span>
-                <span class="inline-flex items-center">
-                    <span class="w-3 h-3 rounded-full bg-gray-500 mr-1.5"></span>
+                <span class="inline-flex items-center bg-red-100 text-red-800 px-2.5 py-0.5 rounded-full">
+                    <span class="w-3 h-3 rounded-full mr-1.5"></span>
                     Expired
                 </span>
+                <span class="inline-flex items-center bg-yellow-100 text-yellow-800 px-2.5 py-0.5 rounded-full">
+                    <span class="w-3 h-3 rounded-full mr-1.5"></span>
+                    Warning (0-7 days)
+                </span>
+                <span class="inline-flex items-center bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full">
+                    <span class="w-3 h-3 rounded-full mr-1.5"></span>
+                    Safe (7+ days)
+                </span>
             </div>
-        </div> -->
+        </div> 
     </div>
 @endsection
+

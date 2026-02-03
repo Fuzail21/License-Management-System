@@ -24,7 +24,7 @@ class LicenseRenewalController extends Controller
             ->sortBy(function ($license) {
                 return $license->remaining_days;
             })
-            ->values();
+            ->values()->sortByDesc('remaining_days');
 
         return view('admin.renewals.index', compact('licenses'));
     }

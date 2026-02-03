@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\LicenseRenewalController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserLicenseController;
@@ -108,6 +109,9 @@ Route::prefix('admin')
             Route::get('licenses/pending', [LicenseController::class, 'pending'])->name('licenses.pending');
             Route::patch('licenses/{license}/approve', [LicenseController::class, 'approve'])->name('licenses.approve');
             Route::patch('licenses/{license}/reject', [LicenseController::class, 'reject'])->name('licenses.reject');
+            Route::get('licenses/{license}/renew', [LicenseController::class, 'renewForm'])->name('licenses.renew.form');
+            Route::post('licenses/{license}/renew', [LicenseController::class, 'renew'])->name('licenses.renew');
+            Route::get('licenses/{license}/renewal-history', [LicenseController::class, 'renewalHistory'])->name('licenses.renewal-history');
             Route::resource('licenses', LicenseController::class);
             Route::resource('user-licenses', UserLicenseController::class);
 
@@ -124,6 +128,15 @@ Route::prefix('admin')
                 'renewals/{license}',
                 [LicenseRenewalController::class, 'store']
             )->name('renewals.store');
+
+            // Reports
+            Route::prefix('reports')->name('reports.')->group(function () {
+                Route::get('/', [ReportController::class, 'index'])->name('index');
+                Route::post('/generate', [ReportController::class, 'generate'])->name('generate');
+                Route::get('/export/excel', [ReportController::class, 'exportExcel'])->name('export.excel');
+                Route::get('/export/pdf', [ReportController::class, 'exportPdf'])->name('export.pdf');
+                Route::get('/print', [ReportController::class, 'print'])->name('print');
+            });
         });
 
         /*

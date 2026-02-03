@@ -8,10 +8,17 @@ use App\Http\Requests\Admin\UpdateLicenseRequest;
 use App\Models\License;
 use App\Models\LicenseStatus;
 use App\Models\Vendor;
+use App\Services\LicenseRenewalService;
 use Illuminate\Http\Request;
 
 class LicenseController extends Controller
 {
+    protected LicenseRenewalService $renewalService;
+
+    public function __construct(LicenseRenewalService $renewalService)
+    {
+        $this->renewalService = $renewalService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -101,6 +108,11 @@ class LicenseController extends Controller
 
         $license = License::create($data);
 
+        // Record initial renewal date in history
+        if ($license->renewal_date) {
+            $this->renewalService->recordInitialRenewalDate($license);
+        }
+
         $message = $license->status === LicenseStatus::Pending->value
             ? 'License created and pending admin approval.'
             : 'License created successfully.';
@@ -116,8 +128,10 @@ class LicenseController extends Controller
     {
         $this->authorize('view', $license);
 
-        $license->load(['vendor', 'userLicenses.employee', 'creator', 'approver']);
-        return view('admin.licenses.show', compact('license'));
+        $license->load(['vendor', 'userLicenses.employee', 'creator', 'approver', 'renewalHistories.changedByUser']);
+        $renewalStats = $this->renewalService->getRenewalStatistics($license);
+
+        return view('admin.licenses.show', compact('license', 'renewalStats'));
     }
 
     /**
@@ -138,7 +152,30 @@ class LicenseController extends Controller
     {
         $this->authorize('update', $license);
 
-        $license->update($request->validated());
+        $validated = $request->validated();
+        $oldRenewalDate = $license->renewal_date?->format('Y-m-d');
+        $newRenewalDate = $validated['renewal_date'] ?? null;
+
+        // Check if renewal date has changed
+        if ($newRenewalDate && $oldRenewalDate !== $newRenewalDate) {
+            // Track the renewal date change
+            $changeType = $request->input('renewal_change_type', 'renewal');
+            $reason = $request->input('renewal_reason');
+
+            $this->renewalService->updateRenewalDate(
+                $license,
+                $newRenewalDate,
+                $changeType,
+                $reason,
+                $request->input('renewal_cost')
+            );
+
+            // Remove renewal_date from validated data since it's already updated
+            unset($validated['renewal_date']);
+        }
+
+        // Update other fields
+        $license->update($validated);
 
         return redirect()->route('admin.licenses.index')
             ->with('success', 'License updated successfully.');
@@ -211,5 +248,62 @@ class LicenseController extends Controller
 
         return redirect()->back()
             ->with('success', 'License rejected.');
+    }
+
+    /**
+     * Show the renewal form for a license.
+     */
+    public function renewForm(License $license)
+    {
+        $this->authorize('update', $license);
+
+        $license->load(['vendor', 'renewalHistories.changedByUser']);
+        $renewalStats = $this->renewalService->getRenewalStatistics($license);
+
+        return view('admin.licenses.renew', compact('license', 'renewalStats'));
+    }
+
+    /**
+     * Process the license renewal.
+     */
+    public function renew(Request $request, License $license)
+    {
+        $this->authorize('update', $license);
+
+        $request->validate([
+            'new_renewal_date' => 'required|date|after:today',
+            'change_type' => 'required|in:renewal,extension,correction',
+            'reason' => 'required|string|max:1000',
+            'renewal_cost' => 'nullable|numeric|min:0',
+        ]);
+
+        $this->renewalService->updateRenewalDate(
+            $license,
+            $request->new_renewal_date,
+            $request->change_type,
+            $request->reason,
+            $request->renewal_cost
+        );
+
+        return redirect()->route('admin.licenses.show', $license)
+            ->with('success', 'License renewed successfully.');
+    }
+
+    /**
+     * Get renewal history for a license (AJAX).
+     */
+    public function renewalHistory(License $license)
+    {
+        $this->authorize('view', $license);
+
+        $histories = $license->renewalHistories()
+            ->with('changedByUser')
+            ->orderBy('changed_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'histories' => $histories,
+        ]);
     }
 }

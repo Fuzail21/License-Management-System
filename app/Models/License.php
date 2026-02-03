@@ -68,6 +68,22 @@ class License extends Model
     }
 
     /**
+     * Get the renewal history for this license.
+     */
+    public function renewalHistories(): HasMany
+    {
+        return $this->hasMany(LicenseRenewalHistory::class)->orderBy('changed_at', 'desc');
+    }
+
+    /**
+     * Get the latest renewal history record.
+     */
+    public function latestRenewalHistory()
+    {
+        return $this->hasOne(LicenseRenewalHistory::class)->latestOfMany('changed_at');
+    }
+
+    /**
      * Get the user who created this license.
      */
     public function creator(): BelongsTo
@@ -133,6 +149,7 @@ class License extends Model
 
     /**
      * Get the remaining days until renewal.
+     * Returns positive for future dates, negative for past dates.
      */
     public function getRemainingDaysAttribute(): int
     {
@@ -144,7 +161,8 @@ class License extends Model
             ? $this->renewal_date
             : \Carbon\Carbon::parse($this->renewal_date);
 
-        return (int) \Carbon\Carbon::today()->diffInDays($renewalDate, false);
+        // renewalDate - today = positive if renewal is in the future
+        return (int) $renewalDate->startOfDay()->diffInDays(\Carbon\Carbon::today(), false);
     }
 }
 
